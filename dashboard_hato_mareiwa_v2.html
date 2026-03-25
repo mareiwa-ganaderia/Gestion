@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hato Mareiwa — Dashboard Lechero</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#f5f2ec;--surface:#fffef9;--surface2:#f0ede5;
+  --border:rgba(60,50,30,.12);--border2:rgba(60,50,30,.22);
+  --text:#1e1a12;--text2:#6b6050;--text3:#9c8f7e;
+  --green:#2d6a4f;--green-bg:#d8f3dc;--green-t:#1b4332;
+  --teal:#0f6e56;--blue:#1a5276;--blue-bg:#d6eaf8;--blue-t:#1a3a5c;
+  --amber:#c8813a;--amber-bg:#fef3cd;--amber-t:#5a3e08;
+  --red:#922b21;--red-bg:#fde8e6;--red-t:#7b241c;
+  --purple-bg:#ede9f8;--purple-t:#4a3080;
+  --accent:#c8813a;--r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:var(--text);color:#fffef9;padding:22px 40px 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
+.h-eye{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);}
+.h-title{font-family:'DM Serif Display',serif;font-size:26px;line-height:1.1;color:#fffef9;}
+.h-sub{font-size:12px;color:rgba(255,254,249,.45);margin-top:2px;}
+.h-date{font-size:11px;color:rgba(255,254,249,.35);text-align:right;}
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;gap:0;overflow-x:auto;}
+.tab-btn{padding:13px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--accent);}
+.content{padding:28px 40px;max-width:1400px;}
+.panel{display:none;}.panel.active{display:block;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:11px;margin-bottom:24px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.k-green::before{background:var(--green);}.k-teal::before{background:var(--teal);}
+.k-blue::before{background:var(--blue);}.k-amber::before{background:var(--accent);}
+.k-red::before{background:var(--red);}.k-gray::before{background:var(--text3);}
+.k-purple::before{background:#6c3483;}
+.kpi-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.kpi-val{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);line-height:1;}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.cc.full{grid-column:1/-1;}
+.ct{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+.leg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);}
+.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.sl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:2px;}
+.fr{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.fr label{font-size:12px;color:var(--text2);}
+select{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 9px;border:1px solid var(--border2);border-radius:6px;background:var(--surface);color:var(--text);cursor:pointer;}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead tr{background:var(--surface2);}
+th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+.badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+.b-lac{background:var(--green-bg);color:var(--green-t);}
+.b-sec{background:var(--amber-bg);color:var(--amber-t);}
+.b-pre{background:var(--blue-bg);color:var(--blue-t);}
+.b-nov{background:var(--purple-bg);color:var(--purple-t);}
+.b-ter{background:#fce4ec;color:#880e4f;}
+.b-lec{background:#e8f5e9;color:#1b5e20;}
+.b-sal{background:var(--red-bg);color:var(--red-t);}
+.tu{color:var(--green);font-size:11px;font-weight:500;}
+.td{color:var(--red);font-size:11px;font-weight:500;}
+.tf{color:var(--text3);font-size:11px;}
+.nc{font-variant-numeric:tabular-nums;text-align:right;}
+.ch{background:#d8f3dc;color:#1b4332;font-weight:500;}
+.cm{background:#fff8e1;color:#5a3e08;}
+.cl{background:#fde8e6;color:#7b241c;}
+/* Radar/lineal */
+.radar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:16px;}
+.score-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.score-label{font-size:11px;color:var(--text2);width:160px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.score-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.score-fill{height:100%;border-radius:4px;transition:width .3s;}
+.score-val{font-size:11px;font-weight:600;color:var(--text);width:20px;text-align:right;flex-shrink:0;}
+/* Genomica badges */
+.pos{background:#d8f3dc;color:#1b4332;font-weight:600;}
+.neg{background:#fde8e6;color:#7b241c;font-weight:600;}
+.neu{background:var(--surface2);color:var(--text2);}
+.footer{text-align:center;font-size:11px;color:var(--text3);padding:20px 40px;border-top:1px solid var(--border);margin-top:16px;}
+@media(max-width:768px){
+  .header{padding:16px 20px;flex-direction:column;align-items:flex-start;}
+  .tab-bar,.content{padding-left:16px;padding-right:16px;}
+  .row2,.row3{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .radar-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="h-eye">Dashboard lechero</div>
+    <div class="h-title">Hato Mareiwa</div>
+    <div class="h-sub">Inventario · Pesaje · Genómica · Evaluación Lineal</div>
+  </div>
+  <div class="h-date" id="hFecha"></div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="sw('inventario')">Inventario</button>
+  <button class="tab-btn" onclick="sw('pesaje')">Pesaje</button>
+  <button class="tab-btn" onclick="sw('genomica')">Genómica</button>
+  <button class="tab-btn" onclick="sw('lineal')">Evaluación Lineal</button>
+</div>
+
+<div class="content">
+
+<!-- ══════════════════════════════ INVENTARIO ══════════════════════════════ -->
+<div class="panel active" id="panel-inventario">
+  <div class="kpi-grid">
+    <div class="kpi k-teal"><div class="kpi-label">Total animales</div><div class="kpi-val">46</div><div class="kpi-sub">Hato completo</div></div>
+    <div class="kpi k-green"><div class="kpi-label">En lactancia</div><div class="kpi-val">18</div><div class="kpi-sub">39% del hato</div></div>
+    <div class="kpi k-blue"><div class="kpi-label">Preñadas</div><div class="kpi-val">4</div><div class="kpi-sub">Próximo reemplazo</div></div>
+    <div class="kpi k-amber"><div class="kpi-label">Secas</div><div class="kpi-val">6</div><div class="kpi-sub">En descanso</div></div>
+    <div class="kpi k-gray"><div class="kpi-label">Novillas</div><div class="kpi-val">5</div><div class="kpi-sub">Futuro productivo</div></div>
+    <div class="kpi k-gray"><div class="kpi-label">Terneras</div><div class="kpi-val">5</div><div class="kpi-sub">Nacidas recientes</div></div>
+    <div class="kpi k-red"><div class="kpi-label">Salidas</div><div class="kpi-val">2</div><div class="kpi-sub">Este período</div></div>
+    <div class="kpi k-teal"><div class="kpi-label">Edad prom. lactantes</div><div class="kpi-val">3.8</div><div class="kpi-sub">años</div></div>
+  </div>
+  <div class="row2">
+    <div class="cc"><div class="ct">Distribución por estado</div><div class="leg" id="legE"></div><div style="position:relative;height:210px"><canvas id="cE"></canvas></div></div>
+    <div class="cc"><div class="ct">Distribución por raza</div><div class="leg" id="legR"></div><div style="position:relative;height:210px"><canvas id="cR"></canvas></div></div>
+  </div>
+  <div class="cc full" style="margin-bottom:16px"><div class="ct">Estructura de edades</div><div style="position:relative;height:170px"><canvas id="cEdad"></canvas></div></div>
+  <div class="sl">Listado de animales</div>
+  <div class="fr">
+    <label>Estado:</label>
+    <select id="fE" onchange="filtInv()"><option value="">Todos</option><option>Lactancia</option><option>Seca</option><option>Preñada</option><option>Novilla</option><option>Ternera</option><option>Leche</option><option>Salió</option></select>
+    <label>Raza:</label>
+    <select id="fR" onchange="filtInv()"><option value="">Todas</option><option>Holstein</option><option>Ayrshire</option></select>
+  </div>
+  <div class="tw"><table><thead><tr><th>#</th><th>Nombre</th><th>Estado</th><th>Raza</th><th>Padre</th><th>Madre</th><th>Fecha nac.</th><th>Edad</th></tr></thead><tbody id="tbInv"></tbody></table></div>
+</div>
+
+<!-- ══════════════════════════════ PESAJE ══════════════════════════════ -->
+<div class="panel" id="panel-pesaje">
+  <div class="kpi-grid" id="kpiPes"></div>
+  <div class="cc full" style="margin-bottom:16px"><div class="ct">Evolución promedio diario del hato (kg/vaca)</div><div style="position:relative;height:230px"><canvas id="cTend"></canvas></div></div>
+  <div class="row2">
+    <div class="cc"><div class="ct">Ranking — último pesaje (21 mar)</div><div style="position:relative;height:480px"><canvas id="cRank"></canvas></div></div>
+    <div class="cc"><div class="ct">Variación vs. pesaje anterior (%)</div><div style="position:relative;height:480px"><canvas id="cVar"></canvas></div></div>
+  </div>
+  <div class="sl">Detalle de pesajes por animal</div>
+  <div class="tw"><table><thead id="thPes"></thead><tbody id="tbPes"></tbody></table></div>
+</div>
+
+<!-- ══════════════════════════════ GENÓMICA ══════════════════════════════ -->
+<div class="panel" id="panel-genomica">
+  <div class="kpi-grid">
+    <div class="kpi k-green"><div class="kpi-label">Animales evaluados</div><div class="kpi-val">11</div><div class="kpi-sub">Colanta + Hoja2</div></div>
+    <div class="kpi k-teal"><div class="kpi-label">Mayor MN$</div><div class="kpi-val">298</div><div class="kpi-sub">Canela (HO)</div></div>
+    <div class="kpi k-amber"><div class="kpi-label">Mejor leche</div><div class="kpi-val">964</div><div class="kpi-sub">lbs · Mimosa</div></div>
+    <div class="kpi k-blue"><div class="kpi-label">A2A2 b-CN</div><div class="kpi-val">5</div><div class="kpi-sub">animales</div></div>
+    <div class="kpi k-purple"><div class="kpi-label">A1A2 b-CN</div><div class="kpi-val">4</div><div class="kpi-sub">animales</div></div>
+    <div class="kpi k-red"><div class="kpi-label">MN$ negativo</div><div class="kpi-val">4</div><div class="kpi-sub">requieren atención</div></div>
+  </div>
+
+  <div class="row2">
+    <div class="cc"><div class="ct">Ranking MN$ por animal</div><div style="position:relative;height:300px"><canvas id="cMN"></canvas></div></div>
+    <div class="cc"><div class="ct">Leche (lbs) por animal</div><div style="position:relative;height:300px"><canvas id="cLeche"></canvas></div></div>
+  </div>
+
+  <div class="cc full" style="margin-bottom:16px">
+    <div class="ct">Índices económicos comparados (MN$ · GM$ · CM$)</div>
+    <div style="position:relative;height:260px"><canvas id="cIdx"></canvas></div>
+  </div>
+
+  <div class="sl">Tabla genómica completa</div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Animal</th><th>Raza</th><th>MN$</th><th>GM$</th><th>CM$</th><th>Leche (lbs)</th><th>% P</th><th>% G</th><th>SCS</th><th>PL</th><th>LIV</th><th>DPR</th><th>PTAT</th><th>b-CN</th><th>k-CN</th><th>Haplotipos</th></tr></thead>
+      <tbody id="tbGen"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ LINEAL ══════════════════════════════ -->
+<div class="panel" id="panel-lineal">
+  <div class="kpi-grid">
+    <div class="kpi k-green"><div class="kpi-label">Animales evaluados</div><div class="kpi-val">21</div><div class="kpi-sub">Evaluación morfológica</div></div>
+    <div class="kpi k-teal"><div class="kpi-label">Mejor ubre ant.</div><div class="kpi-val">8/9</div><div class="kpi-sub">Misionera · Morada · Silvana</div></div>
+    <div class="kpi k-blue"><div class="kpi-label">Mejor fortaleza</div><div class="kpi-val">8/9</div><div class="kpi-sub">Múltiples animales</div></div>
+    <div class="kpi k-amber"><div class="kpi-label">Parámetros medidos</div><div class="kpi-val">17</div><div class="kpi-sub">Escala 1–9</div></div>
+  </div>
+
+  <div class="fr">
+    <label>Seleccionar animal:</label>
+    <select id="selLineal" onchange="renderLineal()"></select>
+  </div>
+
+  <div class="row2" style="margin-bottom:16px;">
+    <div class="cc"><div class="ct" id="radarTitle">Perfil morfológico</div><div style="position:relative;height:340px"><canvas id="cRadar"></canvas></div></div>
+    <div class="cc" id="barrasLineal"><div class="ct">Puntuaciones detalladas (escala 1–9)</div><div id="scoreBarras"></div></div>
+  </div>
+
+  <div class="sl">Comparativa — todos los animales</div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Animal</th><th>Estatura</th><th>Fortaleza</th><th>Profundidad</th><th>Car. Lechero</th><th>Áng. Anca</th><th>Ancho Anca</th><th>Patas Lat.</th><th>Patas Post.</th><th>Áng. Pezuña</th><th>Ubre Ant.</th><th>Alto Ubre</th><th>Ancho Ubre</th><th>Lig. Central</th><th>Prof. Ubre</th><th>Pez. Del.</th><th>Pez. Tras.</th><th>Med. Pezones</th></tr></thead>
+      <tbody id="tbLineal"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">Hato Mareiwa · Dashboard v2 · Datos al 21 mar 2026 · Para actualizar: sube el archivo a Claude y genera nueva versión</div>
+
+<script>
+/* ════════════ DATOS ════════════ */
+const inventario=[
+  {num:1,nombre:'Chaquira',estado:'Lactancia',padre:'Vilperi',madre:'Pequeña',raza:'Ayrshire',fnac:'2021-02-10',edad:5.19},
+  {num:1,nombre:'Mandala',estado:'Lactancia',padre:'Rager-Red',madre:'Mandarina',raza:'Holstein',fnac:'2023-06-03',edad:2.85},
+  {num:2,nombre:'Serrana',estado:'Seca',padre:'Wiking',madre:'Miscelanea',raza:'Ayrshire',fnac:'2021-02-18',edad:5.17},
+  {num:2,nombre:'Tatiana',estado:'Preñada',padre:'Rager-Red',madre:'Tata',raza:'Holstein',fnac:'2023-08-22',edad:2.63},
+  {num:3,nombre:'Tifani',estado:'Preñada',padre:'Rager-Red',madre:'Timida',raza:'Holstein',fnac:'2024-06-04',edad:1.83},
+  {num:4,nombre:'Mariana',estado:'Preñada',padre:'Rager-Red',madre:'Mandarina',raza:'Holstein',fnac:'2024-06-22',edad:1.78},
+  {num:5,nombre:'Molly',estado:'Novilla',padre:'Zooty',madre:'Morada',raza:'Holstein',fnac:'2024-12-24',edad:1.27},
+  {num:6,nombre:'Canela',estado:'Novilla',padre:'Zooty',madre:'Cata',raza:'Holstein',fnac:'2025-01-14',edad:1.21},
+  {num:7,nombre:'Natacha',estado:'Novilla',padre:'Zooty',madre:'Nanis',raza:'Holstein',fnac:'2025-01-17',edad:1.20},
+  {num:8,nombre:'Martina',estado:'Ternera',padre:'MayFlower',madre:'Mandarina',raza:'Holstein',fnac:'2025-05-23',edad:0.85},
+  {num:9,nombre:'Diamante',estado:'Ternera',padre:'MayFlower',madre:'Diana',raza:'Holstein',fnac:'2025-06-03',edad:0.82},
+  {num:10,nombre:'Macarena',estado:'Leche',padre:'Etowah-red',madre:'Mandala',raza:'Holstein',fnac:'2025-09-05',edad:0.56},
+  {num:11,nombre:'Morita',estado:'Leche',padre:'Patan',madre:'Morada',raza:'Holstein',fnac:'2026-02-14',edad:0.11},
+  {num:12,nombre:'Silvana',estado:'Lactancia',padre:'Rusty-Red',madre:'Silvia',raza:'Holstein',fnac:'2021-07-08',edad:4.78},
+  {num:12,nombre:'Natalia',estado:'Ternera',padre:'Doctor',madre:'Nanis',raza:'Holstein',fnac:'2026-03-03',edad:0.06},
+  {num:13,nombre:'Jocosa',estado:'Lactancia',padre:'Rusty-Red',madre:'Joya',raza:'Holstein',fnac:'2021-07-18',edad:4.75},
+  {num:17,nombre:'Puntilla',estado:'Lactancia',padre:'B-King',madre:'Puntada',raza:'Ayrshire',fnac:'2023-07-28',edad:2.70},
+  {num:18,nombre:'Poly',estado:'Lactancia',padre:'B-King',madre:'Polea',raza:'Ayrshire',fnac:'2023-10-10',edad:2.49},
+  {num:19,nombre:'Colombina',estado:'Novilla',padre:'B-King',madre:'Colombiana',raza:'Ayrshire',fnac:'2024-01-11',edad:2.23},
+  {num:20,nombre:'Mimosa',estado:'Novilla',padre:'Chaos',madre:'Miscelanea',raza:'Ayrshire',fnac:'2025-03-06',edad:1.07},
+  {num:21,nombre:'Monserrat',estado:'Ternera',padre:'Reynolds',madre:'Mozarella',raza:'Ayrshire',fnac:'2025-05-23',edad:0.85},
+  {num:22,nombre:'Selena',estado:'Ternera',padre:'Chaos',madre:'Serrana',raza:'Ayrshire',fnac:'2025-06-12',edad:0.79},
+  {num:23,nombre:'Pulida',estado:'Leche',padre:'Burandt',madre:'Puntilla',raza:'Ayrshire',fnac:'2025-11-27',edad:0.33},
+  {num:24,nombre:'Polita',estado:'Leche',padre:'Burandt',madre:'Poly',raza:'Ayrshire',fnac:'2026-01-02',edad:0.23},
+  {num:25,nombre:'Polar',estado:'Leche',padre:'Burandt',madre:'Polea',raza:'Ayrshire',fnac:'2026-02-01',edad:0.14},
+  {num:26,nombre:'Pollet',estado:'Leche',padre:'Burandt',madre:'Polea',raza:'Ayrshire',fnac:'2026-02-01',edad:0.14},
+  {num:102,nombre:'Mandarina',estado:'Lactancia',padre:'-',madre:'-',raza:'Holstein',fnac:'-',edad:null},
+  {num:103,nombre:'Morocha',estado:'Lactancia',padre:'-',madre:'-',raza:'-',fnac:'-',edad:null},
+  {num:104,nombre:'Yurany',estado:'Lactancia',padre:'-',madre:'-',raza:'-',fnac:'-',edad:null},
+  {num:105,nombre:'Diana',estado:'Lactancia',padre:'-',madre:'-',raza:'-',fnac:'-',edad:null},
+  {num:106,nombre:'Sirena',estado:'Lactancia',padre:'-',madre:'-',raza:'-',fnac:'-',edad:null},
+  {num:110,nombre:'Xiomara',estado:'Lactancia',padre:'-',madre:'-',raza:'-',fnac:'-',edad:null},
+  {num:111,nombre:'Estrella',estado:'Preñada',padre:'Ju-Red',madre:'Esmeralda',raza:'Holstein',fnac:'2024-01-01',edad:2.26},
+  {num:177,nombre:'Tímida',estado:'Seca',padre:'Rusty-Red',madre:'Terracota',raza:'Holstein',fnac:'2021-03-09',edad:5.12},
+  {num:432,nombre:'Polea',estado:'Lactancia',padre:'Roukstar',madre:'Poema',raza:'Ayrshire',fnac:'2018-06-08',edad:7.91},
+  {num:433,nombre:'Pequeña',estado:'Salió',padre:'Benjamín',madre:'Pepina',raza:'Ayrshire',fnac:'2018-08-06',edad:7.74},
+  {num:436,nombre:'Golondrina',estado:'Seca',padre:'Yankee',madre:'Gota',raza:'Ayrshire',fnac:'2018-07-13',edad:7.81},
+  {num:440,nombre:'Miscelanea',estado:'Seca',padre:'Benjamin',madre:'Mixta',raza:'Ayrshire',fnac:'2018-07-18',edad:7.80},
+  {num:441,nombre:'Colombiana',estado:'Lactancia',padre:'Linne',madre:'Comparsa',raza:'Ayrshire',fnac:'2018-09-23',edad:7.61},
+  {num:442,nombre:'Mozarella',estado:'Salió',padre:'Benjamín',madre:'Molly',raza:'Ayrshire',fnac:'2018-09-28',edad:7.60},
+  {num:897,nombre:'Sandy',estado:'Lactancia',padre:'Altaextreme',madre:'Sandra',raza:'Holstein',fnac:'2020-05-26',edad:5.91},
+  {num:2452,nombre:'Misionera',estado:'Seca',padre:'Subzero',madre:'Mitica',raza:'Holstein',fnac:'2021-07-28',edad:4.73},
+  {num:2552,nombre:'Morada',estado:'Lactancia',padre:'Radar',madre:'Mosca',raza:'Holstein',fnac:'2022-07-14',edad:3.75},
+  {num:2559,nombre:'Cata',estado:'Seca',padre:'Toretto-ET',madre:'Carola',raza:'Holstein',fnac:'2022-07-22',edad:3.73},
+  {num:2578,nombre:'Nanis',estado:'Lactancia',padre:'Avalino-ET',madre:'Ninfa',raza:'Holstein',fnac:'2022-12-17',edad:3.32},
+  {num:2593,nombre:'Alicia',estado:'Lactancia',padre:'Fumagalli',madre:'Alma',raza:'Holstein',fnac:'2023-02-23',edad:3.13},
+];
+
+const FECHAS=['04-ene','11-ene','18-ene','23-ene','31-ene','07-feb','15-feb','19-feb','01-mar','04-mar','15-mar','21-mar'];
+const pesaje=[
+  {id:105,nombre:'Diana',vals:[24.6,22,21,21.2,23,23,23,21,22,19,19.2,19]},
+  {id:177,nombre:'Tímida',vals:[22.6,21,19.8,21,21,20,19,18.6,19,18,17.2,null]},
+  {id:432,nombre:'Polea',vals:[null,null,null,null,null,27,31,28.8,32.2,31.2,30.2,32]},
+  {id:106,nombre:'Sirena',vals:[15,15,13,13,13,13,14,12.2,12,11,7.6,9]},
+  {id:2552,nombre:'Morada',vals:[null,null,null,null,null,null,null,20.8,27,28.2,29.2,29.6]},
+  {id:2593,nombre:'Alicia',vals:[26.6,22,23,23,21.6,21,22.2,22.6,22,21.2,23,23]},
+  {id:2578,nombre:'Nanis',vals:[null,null,null,null,null,null,null,null,null,31,33.8,34.2]},
+  {id:441,nombre:'Colombiana',vals:[null,null,null,null,null,null,20.4,21.8,24.6,24.2,25,22.4]},
+  {id:897,nombre:'Sandy',vals:[18.2,18.2,18.2,17.4,17,16,15,14.6,16.2,15,14.2,14]},
+  {id:2,nombre:'Serrana',vals:[23.6,22.2,22,22.4,20.4,21.4,19,19.8,20.2,17,18.2,null]},
+  {id:1,nombre:'Chaquira',vals:[19.2,null,null,null,null,null,null,null,null,null,null,28]},
+  {id:110,nombre:'Xiomara',vals:[28.8,34,32,30,31,33,33,29,33.6,21,31.2,30]},
+  {id:13,nombre:'Jocosa',vals:[42.6,41.2,39,39.2,38.6,36.6,36.2,35,38.8,36,34.4,34.6]},
+  {id:12,nombre:'Silvana',vals:[43.4,42,38,38,37.8,38,36,35.6,37.2,36.2,36.2,36.6]},
+  {id:104,nombre:'Yurany',vals:[27.2,25,22.2,22,20.6,21,22.6,20.8,22.2,20,18.2,21]},
+  {id:102,nombre:'Mandarina',vals:[29,30,28,25.6,25.2,24.6,23.2,23.2,23.6,22.6,16.2,13.5]},
+  {id:436,nombre:'Golondrina',vals:[19,16.8,16,17.2,16.2,16,14.4,15.8,16,13.4,null,null]},
+  {id:1,nombre:'Mandala',vals:[28,28,25,27,27.4,26.2,26.2,27.6,27,24,23,23.2]},
+  {id:18,nombre:'Poly',vals:[16,19.4,21,21.2,21,22.6,23.4,23.6,23,26.6,22,22]},
+  {id:17,nombre:'Puntilla',vals:[27,23.8,26.4,24.2,26,25,21.2,null,21.6,22,22.6,23]},
+  {id:103,nombre:'Morocha',vals:[28.6,27,25,27.6,28,24.2,26.6,25.8,25.6,24.2,24.2,23]},
+];
+
+const genomica=[
+  {animal:'MIMOSA 20',raza:'AY (93%)',mn:207,gm:218,cm:214,leche:964,pP:0.01,pG:-0.17,scs:2.94,pl:-0.2,liv:1.5,dpr:0.6,ptat:-0.40,bcn:'A1A2',kcn:'AB',hap:'AH2T'},
+  {animal:'SELENA 22',raza:'AY (80%)',mn:205,gm:215,cm:210,leche:514,pP:0.01,pG:-0.04,scs:2.98,pl:0.4,liv:2.0,dpr:1.2,ptat:-0.20,bcn:'A2A2',kcn:'AA',hap:'AH2T'},
+  {animal:'MACARENA',raza:'HO (100%)',mn:93,gm:83,cm:90,leche:301,pP:-0.01,pG:-0.06,scs:3.04,pl:1.7,liv:0.6,dpr:0.3,ptat:0.38,bcn:'A2A2',kcn:'AB',hap:'HH3T,HH4T,HH5T'},
+  {animal:'PULIDA',raza:'AY (100%)',mn:60,gm:28,cm:48,leche:719,pP:-0.06,pG:-0.09,scs:2.90,pl:-0.9,liv:0.2,dpr:-1.5,ptat:0.30,bcn:'A1A1',kcn:'AE',hap:'AH2T'},
+  {animal:'MARTINA 09',raza:'HO (100%)',mn:-200,gm:-213,cm:-208,leche:568,pP:-0.03,pG:-0.24,scs:2.91,pl:-0.8,liv:-0.3,dpr:-0.6,ptat:-1.41,bcn:'A1A2',kcn:'AB',hap:'HH3T,HH4T,HH5T'},
+  {animal:'DIAMANTE 09',raza:'HO (100%)',mn:-206,gm:-188,cm:-205,leche:-240,pP:0.01,pG:-0.02,scs:3.08,pl:-1.5,liv:0.7,dpr:1.1,ptat:-0.46,bcn:'A1A2',kcn:'AB',hap:'HH3T,HH4T,HH5T'},
+  {animal:'MONSERRAT 21',raza:'AY (100%)',mn:-225,gm:-259,cm:-241,leche:-118,pP:-0.07,pG:-0.06,scs:2.94,pl:-0.3,liv:-0.1,dpr:-1.1,ptat:0.40,bcn:'A1A2',kcn:'AA',hap:'AH2C'},
+  {animal:'CANELA',raza:'HO',mn:298,gm:294,cm:306,leche:334,pP:0.02,pG:0.02,scs:2.95,pl:1.9,liv:1.7,dpr:0.0,ptat:-0.63,bcn:'A2/A2',kcn:'AB',hap:'HH1T,HH2T,...'},
+  {animal:'MOLLY',raza:'HO',mn:238,gm:237,cm:270,leche:-355,pP:0.09,pG:0.20,scs:3.02,pl:-0.1,liv:0.2,dpr:-0.7,ptat:-0.36,bcn:'A2/A2',kcn:'BB',hap:'HH1T,HH2T,...'},
+  {animal:'NATACHA',raza:'HO',mn:116,gm:104,cm:108,leche:303,pP:-0.02,pG:0.06,scs:3.10,pl:-0.1,liv:-1.0,dpr:-0.9,ptat:-0.87,bcn:'A2/A2',kcn:'AB',hap:'HH1T,HH2T,...'},
+  {animal:'ESTRELLA',raza:'HO',mn:-521,gm:-489,cm:-514,leche:-1233,pP:0.04,pG:-0.02,scs:3.05,pl:-1.2,liv:2.0,dpr:2.8,ptat:-2.36,bcn:'A2/A2',kcn:'AA',hap:'HH1T,HH2T,...'},
+];
+
+const PARAMS=['Estatura','Fortaleza','Profundidad','Car. Lechero','Áng. Anca','Ancho Anca','Patas Lat.','Patas Post.','Áng. Pezuña','Ubre Ant.','Alto Ubre','Ancho Ubre','Lig. Central','Prof. Ubre','Pez. Del.','Pez. Tras.','Med. Pezones'];
+const lineal=[
+  {n:'440 Miscelanea', s:[6,7,6,7,6,6,5,5,4,4,4,4,4,7,7,7,4]},
+  {n:'108 Presumida',  s:[6,8,6,7,6,6,5,5,7,4,5,5,4,7,5,6,4]},
+  {n:'106 Sirena',     s:[6,6,6,7,7,6,4,5,7,5,6,6,7,7,5,5,4]},
+  {n:'01 Chaquira',    s:[6,7,6,7,6,6,4,5,6,6,7,7,7,7,5,6,5]},
+  {n:'02 Serrana',     s:[6,8,6,7,6,7,5,5,5,7,7,7,5,7,5,5,5]},
+  {n:'2559 Cata',      s:[6,7,6,7,7,7,5,5,5,7,7,7,5,7,5,5,5]},
+  {n:'110 Xiomara',    s:[6,7,6,7,7,6,5,4,5,7,7,7,6,7,5,5,5]},
+  {n:'2452 Misionera', s:[6,8,6,7,7,7,4,5,5,8,8,8,7,7,5,5,5]},
+  {n:'105 Diana',      s:[6,7,7,7,5,7,5,4,5,4,6,4,4,5,7,8,5]},
+  {n:'2552 Morada',    s:[6,8,6,7,7,7,4,5,5,8,8,8,7,7,5,5,5]},
+  {n:'012 Silvana',    s:[6,8,6,7,7,7,4,5,5,8,8,8,7,7,5,5,5]},
+  {n:'432 Polea',      s:[6,7,6,7,5,5,5,4,4,4,5,5,3,7,5,6,4]},
+  {n:'441 Colombiana', s:[6,4,5,5,6,6,5,4,4,4,4,4,3,5,5,5,4]},
+  {n:'102 Mandarina',  s:[6,8,7,7,5,7,4,5,5,8,8,8,8,8,5,5,5]},
+  {n:'013 Jocosa',     s:[6,8,6,7,5,5,5,5,5,4,4,4,3,4,4,4,4]},
+  {n:'2578 Nany',      s:[6,8,7,7,5,7,4,5,5,8,8,8,8,8,5,5,5]},
+  {n:'177 Timida',     s:[6,8,8,7,5,7,4,5,5,8,8,8,8,8,5,5,5]},
+  {n:'433 Pequeña',    s:[6,8,8,6,6,6,5,5,5,7,6,6,4,5,5,5,5]},
+  {n:'442 Mozarella',  s:[6,4,4,5,4,6,7,5,4,5,5,4,3,4,4,4,4]},
+  {n:'897 Sandy',      s:[5,4,3,4,5,5,5,4,6,4,4,4,3,4,4,4,4]},
+  {n:'430 Golondrina', s:[6,6,5,4,5,4,5,5,3,4,4,4,3,4,5,5,5]},
+];
+
+/* ════════════ HELPERS ════════════ */
+function avg(arr){const v=arr.filter(x=>x!=null&&x>0);return v.length?v.reduce((a,b)=>a+b)/v.length:null;}
+function fmt(n,d=1){return n!=null?n.toFixed(d):'-';}
+const ECOLS={Lactancia:'#2d6a4f',Seca:'#c8813a',Preñada:'#1a5276',Novilla:'#6c3483',Ternera:'#c0392b',Leche:'#1e8449',Salió:'#7b7d7d'};
+function bc(e){return{Lactancia:'b-lac',Seca:'b-sec',Preñada:'b-pre',Novilla:'b-nov',Ternera:'b-ter',Leche:'b-lec','Salió':'b-sal'}[e]||'b-lac';}
+function numBadge(v){if(v==null)return'—';const c=v>0?'pos':v<0?'neg':'neu';return`<span class="badge ${c}">${v>0?'+':''}${v}</span>`;}
+
+document.getElementById('hFecha').textContent='Actualizado: '+new Date().toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+
+/* ════════════ TABS ════════════ */
+function sw(t){
+  const tabs=['inventario','pesaje','genomica','lineal'];
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',tabs[i]===t));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+/* ════════════ INVENTARIO ════════════ */
+let invD=[...inventario];
+function filtInv(){
+  const e=document.getElementById('fE').value,r=document.getElementById('fR').value;
+  invD=inventario.filter(a=>(e===''||a.estado===e)&&(r===''||a.raza===r));
+  renderTbInv();
+}
+function renderTbInv(){
+  document.getElementById('tbInv').innerHTML=invD.map(a=>`<tr>
+    <td>${a.num}</td><td style="font-weight:500">${a.nombre}</td>
+    <td><span class="badge ${bc(a.estado)}">${a.estado}</span></td>
+    <td>${a.raza}</td><td style="color:var(--text2)">${a.padre}</td>
+    <td style="color:var(--text2)">${a.madre}</td>
+    <td style="color:var(--text2)">${a.fnac!=='-'?a.fnac:'-'}</td>
+    <td class="nc">${a.edad!=null?a.edad.toFixed(1)+' a':'-'}</td>
+  </tr>`).join('');
+}
+renderTbInv();
+
+const eLabs=['Lactancia','Seca','Preñada','Novilla','Ternera','Leche','Salió'],eVals=[18,6,4,5,5,6,2];
+const eCols=eLabs.map(l=>ECOLS[l]);
+document.getElementById('legE').innerHTML=eLabs.map((l,i)=>`<div class="li"><div class="ld" style="background:${eCols[i]}"></div>${l} (${eVals[i]})</div>`).join('');
+new Chart(document.getElementById('cE'),{type:'doughnut',data:{labels:eLabs,datasets:[{data:eVals,backgroundColor:eCols,borderWidth:2,borderColor:'#fffef9'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+const rCols=['#1a5276','#2d6a4f','#7b7d7d'];
+document.getElementById('legR').innerHTML=`<div class="li"><div class="ld" style="background:${rCols[0]}"></div>Holstein (27)</div><div class="li"><div class="ld" style="background:${rCols[1]}"></div>Ayrshire (14)</div><div class="li"><div class="ld" style="background:${rCols[2]}"></div>Sin dato (5)</div>`;
+new Chart(document.getElementById('cR'),{type:'doughnut',data:{labels:['Holstein','Ayrshire','Sin dato'],datasets:[{data:[27,14,5],backgroundColor:rCols,borderWidth:2,borderColor:'#fffef9'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+const bCounts=[0,0,0,0,0,0];
+inventario.filter(a=>a.edad!=null).forEach(a=>{const e=a.edad;if(e<1)bCounts[0]++;else if(e<2)bCounts[1]++;else if(e<3)bCounts[2]++;else if(e<4)bCounts[3]++;else if(e<5)bCounts[4]++;else bCounts[5]++;});
+new Chart(document.getElementById('cEdad'),{type:'bar',data:{labels:['0–1 a','1–2 a','2–3 a','3–4 a','4–5 a','5+ a'],datasets:[{data:bCounts,backgroundColor:'#2d6a4f',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.05)'}}}}});
+
+/* ════════════ PESAJE ════════════ */
+const ULT=11,PEN=10,ENE=[0,1,2,3,4],FEB=[5,6,7],MAR=[8,9,10,11];
+const ultVals=pesaje.map(a=>a.vals[ULT]).filter(v=>v!=null);
+const promUlt=avg(ultVals);
+const promEne=avg(pesaje.flatMap(a=>ENE.map(i=>a.vals[i])).filter(v=>v!=null));
+const promFeb=avg(pesaje.flatMap(a=>FEB.map(i=>a.vals[i])).filter(v=>v!=null));
+const promMar=avg(pesaje.flatMap(a=>MAR.map(i=>a.vals[i])).filter(v=>v!=null));
+const tFeb=((promFeb-promEne)/promEne*100).toFixed(1);
+const tMar=((promMar-promFeb)/promFeb*100).toFixed(1);
+
+document.getElementById('kpiPes').innerHTML=`
+  <div class="kpi k-green"><div class="kpi-label">Prom. último pesaje</div><div class="kpi-val">${fmt(promUlt)} kg</div><div class="kpi-sub">21 mar 2026</div></div>
+  <div class="kpi k-teal"><div class="kpi-label">Mayor productora</div><div class="kpi-val">36.6 kg</div><div class="kpi-sub">Silvana</div></div>
+  <div class="kpi k-amber"><div class="kpi-label">Menor productora</div><div class="kpi-val">9.0 kg</div><div class="kpi-sub">Sirena</div></div>
+  <div class="kpi k-blue"><div class="kpi-label">Prom. enero</div><div class="kpi-val">${fmt(promEne)} kg</div><div class="kpi-sub">Base período</div></div>
+  <div class="kpi k-${parseFloat(tFeb)>=0?'green':'red'}"><div class="kpi-label">Prom. febrero</div><div class="kpi-val">${fmt(promFeb)} kg</div><div class="kpi-sub">${parseFloat(tFeb)>=0?'▲':'▼'} ${Math.abs(tFeb)}% vs ene</div></div>
+  <div class="kpi k-${parseFloat(tMar)>=0?'green':'red'}"><div class="kpi-label">Prom. marzo</div><div class="kpi-val">${fmt(promMar)} kg</div><div class="kpi-sub">${parseFloat(tMar)>=0?'▲':'▼'} ${Math.abs(tMar)}% vs feb</div></div>
+  <div class="kpi k-gray"><div class="kpi-label">Animales medidos</div><div class="kpi-val">${ultVals.length}</div><div class="kpi-sub">Último pesaje</div></div>
+  <div class="kpi k-gray"><div class="kpi-label">Total est. semanal</div><div class="kpi-val">${Math.round(promUlt*ultVals.length*7/1000*10)/10}k</div><div class="kpi-sub">kg × 7 días</div></div>`;
+
+const tendData=FECHAS.map((_,i)=>{const v=pesaje.map(a=>a.vals[i]).filter(v=>v!=null&&v>0);return v.length?+avg(v).toFixed(2):null;});
+new Chart(document.getElementById('cTend'),{type:'line',data:{labels:FECHAS,datasets:[{label:'Prom kg/vaca',data:tendData,borderColor:'#2d6a4f',backgroundColor:'rgba(45,106,79,.08)',tension:.35,pointRadius:5,pointBackgroundColor:'#2d6a4f',pointBorderColor:'#fffef9',pointBorderWidth:2,fill:true,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:20,grid:{color:'rgba(0,0,0,.05)'}}}}});
+
+const rkD=pesaje.filter(a=>a.vals[ULT]!=null).sort((a,b)=>b.vals[ULT]-a.vals[ULT]);
+new Chart(document.getElementById('cRank'),{type:'bar',data:{labels:rkD.map(a=>a.nombre),datasets:[{data:rkD.map(a=>a.vals[ULT]),backgroundColor:rkD.map(a=>a.vals[ULT]>=30?'#2d6a4f':a.vals[ULT]>=20?'#1a5276':'#c0392b'),borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+const varD=pesaje.filter(a=>a.vals[ULT]!=null&&a.vals[PEN]!=null).map(a=>({nombre:a.nombre,pct:+((a.vals[ULT]-a.vals[PEN])/a.vals[PEN]*100).toFixed(1)})).sort((a,b)=>b.pct-a.pct);
+new Chart(document.getElementById('cVar'),{type:'bar',data:{labels:varD.map(a=>a.nombre),datasets:[{data:varD.map(a=>a.pct),backgroundColor:varD.map(a=>a.pct>=0?'#2d6a4f':'#c0392b'),borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>v+'%',font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+function ccls(v){if(v==null)return'';return v>=30?'ch':v>=20?'cm':'cl';}
+document.getElementById('thPes').innerHTML=`<tr><th>ID</th><th>Nombre</th>${FECHAS.map(f=>`<th>${f}</th>`).join('')}<th>Prom ene</th><th>Prom feb</th><th>Prom mar</th><th>Tendencia</th></tr>`;
+document.getElementById('tbPes').innerHTML=pesaje.map(a=>{
+  const pE=avg(ENE.map(i=>a.vals[i])),pF=avg(FEB.map(i=>a.vals[i])),pM=avg(MAR.map(i=>a.vals[i]));
+  const ult=a.vals[ULT],pen=a.vals[PEN];
+  let tr='<span class="tf">—</span>';
+  if(ult!=null&&pen!=null){const d=((ult-pen)/pen*100).toFixed(1);tr=parseFloat(d)>=0?`<span class="tu">▲ ${d}%</span>`:`<span class="td">▼ ${Math.abs(d)}%</span>`;}
+  return`<tr><td style="color:var(--text2)">${a.id}</td><td style="font-weight:500">${a.nombre}</td>${a.vals.map(v=>`<td class="nc ${ccls(v)}">${v!=null?v:'-'}</td>`).join('')}<td class="nc">${pE!=null?pE.toFixed(1):'-'}</td><td class="nc">${pF!=null?pF.toFixed(1):'-'}</td><td class="nc">${pM!=null?pM.toFixed(1):'-'}</td><td>${tr}</td></tr>`;
+}).join('');
+
+/* ════════════ GENÓMICA ════════════ */
+const genSort=[...genomica].sort((a,b)=>b.mn-a.mn);
+const gCols=genSort.map(a=>a.mn>=0?'#2d6a4f':'#c0392b');
+new Chart(document.getElementById('cMN'),{type:'bar',data:{labels:genSort.map(a=>a.animal.split(' ')[0]),datasets:[{data:genSort.map(a=>a.mn),backgroundColor:gCols,borderRadius:3,label:'MN$'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10}}}}}});
+
+const lSort=[...genomica].sort((a,b)=>b.leche-a.leche);
+new Chart(document.getElementById('cLeche'),{type:'bar',data:{labels:lSort.map(a=>a.animal.split(' ')[0]),datasets:[{data:lSort.map(a=>a.leche),backgroundColor:lSort.map(a=>a.leche>=0?'#1a5276':'#c0392b'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10}}}}}});
+
+new Chart(document.getElementById('cIdx'),{type:'bar',data:{labels:genomica.map(a=>a.animal.split(' ')[0]),datasets:[{label:'MN$',data:genomica.map(a=>a.mn),backgroundColor:'rgba(45,106,79,.75)',borderRadius:2},{label:'GM$',data:genomica.map(a=>a.gm),backgroundColor:'rgba(26,82,118,.65)',borderRadius:2},{label:'CM$',data:genomica.map(a=>a.cm),backgroundColor:'rgba(200,129,58,.65)',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{size:10}}}}}});
+
+document.getElementById('tbGen').innerHTML=genomica.map(a=>`<tr>
+  <td style="font-weight:500">${a.animal}</td>
+  <td><span class="badge" style="background:var(--surface2);color:var(--text2)">${a.raza}</span></td>
+  <td class="nc">${numBadge(a.mn)}</td>
+  <td class="nc">${numBadge(a.gm)}</td>
+  <td class="nc">${numBadge(a.cm)}</td>
+  <td class="nc">${a.leche}</td>
+  <td class="nc">${a.pP>0?'+':''}${a.pP.toFixed(2)}</td>
+  <td class="nc">${a.pG>0?'+':''}${a.pG.toFixed(2)}</td>
+  <td class="nc">${a.scs.toFixed(2)}</td>
+  <td class="nc">${a.pl}</td>
+  <td class="nc">${a.liv}</td>
+  <td class="nc">${a.dpr}</td>
+  <td class="nc">${a.ptat}</td>
+  <td><span class="badge ${a.bcn.includes('A2A2')||a.bcn==='A2/A2'?'pos':'neu'}">${a.bcn}</span></td>
+  <td>${a.kcn}</td>
+  <td style="font-size:10px;color:var(--text2)">${a.hap}</td>
+</tr>`).join('');
+
+/* ════════════ LINEAL ════════════ */
+const sel=document.getElementById('selLineal');
+lineal.forEach((a,i)=>{const o=document.createElement('option');o.value=i;o.textContent=a.n;sel.appendChild(o);});
+
+let radarChart=null;
+function renderLineal(){
+  const idx=parseInt(sel.value);
+  const a=lineal[idx];
+  document.getElementById('radarTitle').textContent='Perfil morfológico — '+a.n;
+
+  // Radar
+  if(radarChart)radarChart.destroy();
+  radarChart=new Chart(document.getElementById('cRadar'),{
+    type:'radar',
+    data:{labels:PARAMS,datasets:[{label:a.n,data:a.s,backgroundColor:'rgba(45,106,79,.15)',borderColor:'#2d6a4f',pointBackgroundColor:'#2d6a4f',pointRadius:4,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:1,max:9,ticks:{stepSize:2,font:{size:9}},pointLabels:{font:{size:10}},grid:{color:'rgba(0,0,0,.08)'}}},plugins:{legend:{display:false}}}
+  });
+
+  // Barras de puntaje
+  const IDEAL=5;
+  document.getElementById('scoreBarras').innerHTML=PARAMS.map((p,i)=>{
+    const v=a.s[i];if(v==null)return'';
+    const pct=(v/9)*100;
+    const col=v>=7?'#2d6a4f':v>=5?'#1a5276':'#c8813a';
+    return`<div class="score-bar-wrap">
+      <div class="score-label">${p}</div>
+      <div class="score-track"><div class="score-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="score-val">${v}</div>
+    </div>`;
+  }).join('');
+}
+renderLineal();
+
+// Tabla comparativa lineal
+document.getElementById('tbLineal').innerHTML=lineal.map(a=>{
+  const avg9=a.s.filter(v=>v!=null);
+  const prom=(avg9.reduce((s,v)=>s+v,0)/avg9.length).toFixed(1);
+  return`<tr>
+    <td style="font-weight:500">${a.n}</td>
+    ${a.s.map(v=>{const col=v>=7?'style="background:#d8f3dc;color:#1b4332;font-weight:500"':v<=3?'style="background:#fde8e6;color:#7b241c"':'';return`<td class="nc" ${col}>${v!=null?v:'-'}</td>`;}).join('')}
+  </tr>`;
+}).join('');
+</script>
+</body>
+</html>

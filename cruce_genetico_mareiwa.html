@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeneMatch — Hato Mareiwa</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --ink: #0a0c10;
+  --ink2: #111520;
+  --ink3: #1a2035;
+  --line: #232d45;
+  --line2: #2e3d5a;
+  --frost: #e8eef8;
+  --frost2: #c4d0e8;
+  --frost3: #8fa3c8;
+  --gold: #c8a84b;
+  --gold2: #e5c76b;
+  --gold3: rgba(200,168,75,0.12);
+  --emerald: #2dd4a0;
+  --sky: #5ba4cf;
+  --rose: #e05c7a;
+  --amber: #e8a348;
+  --violet: #9b7fe8;
+  --text: #dce8f8;
+  --muted: #6b7fa8;
+  --dim: #3a4a68;
+  --radius: 16px;
+  --r-sm: 10px;
+  --shadow: 0 8px 40px rgba(0,0,0,0.5);
+  --glow: 0 0 30px rgba(200,168,75,0.15);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
+html { scroll-behavior: smooth }
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:0;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top:0; z-index:100;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 0 40px;
+  display: flex; align-items:center; justify-content:space-between;
+  height: 64px;
+}
+.brand {
+  display: flex; align-items:center; gap:14px;
+}
+.brand-icon {
+  width:38px; height:38px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; box-shadow: 0 4px 16px rgba(200,168,75,0.35);
+}
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; color: var(--frost);
+  letter-spacing: 0.5px;
+}
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--muted);
+  letter-spacing: 2px; margin-top:2px;
+}
+.header-right {
+  display: flex; align-items:center; gap:16px;
+}
+.herd-badge {
+  background: var(--gold3);
+  border: 1px solid rgba(200,168,75,0.3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gold2);
+  letter-spacing: 1px;
+}
+
+/* ── LAYOUT ── */
+.main { padding: 40px; max-width:1400px; margin:0 auto; position:relative; z-index:1; }
+
+/* ── HERO SECTION ── */
+.hero {
+  text-align: center;
+  padding: 60px 0 40px;
+  position: relative;
+}
+.hero::before {
+  content:'';
+  position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:600px; height:300px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(200,168,75,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-tag {
+  display:inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 3px;
+  color: var(--gold); text-transform:uppercase;
+  border: 1px solid rgba(200,168,75,0.3);
+  padding: 6px 16px; border-radius:20px;
+  margin-bottom:20px;
+  background: rgba(200,168,75,0.06);
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px; line-height:1.1;
+  background: linear-gradient(135deg, var(--frost) 0%, var(--gold2) 60%, var(--gold) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:16px;
+}
+.hero p {
+  font-size:16px; color:var(--muted); max-width:600px; margin:0 auto 40px;
+  line-height:1.6;
+}
+
+/* ── WORKFLOW STEPS ── */
+.steps {
+  display:grid; grid-template-columns: repeat(3,1fr); gap:20px;
+  margin-bottom:48px;
+}
+.step {
+  background: var(--ink2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:24px;
+  position:relative; overflow:hidden;
+  transition: border-color 0.3s, transform 0.2s;
+}
+.step::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:0;
+  transition: opacity 0.3s;
+}
+.step:hover { border-color: var(--line2); transform:translateY(-2px) }
+.step:hover::before { opacity:1 }
+.step-num {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; color:var(--gold); letter-spacing:2px;
+  margin-bottom:10px;
+}
+.step-title {
+  font-size:15px; font-weight:600; color:var(--frost);
+  margin-bottom:6px;
+}
+.step-desc {
+  font-size:12px; color:var(--muted); line-height:1.5;
+}
+
+/* ── PANEL ── */
+.panel {
+  background: var(--ink2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+.panel-head {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.panel-title {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--muted);
+  display:flex; align-items:center; gap:10px;
+}
+.panel-dot {
+  width:6px; height:6px; border-radius:50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(200,168,75,0.6);
+}
+.panel-body { padding: 28px; }
+
+/* ── COW SELECTOR ── */
+.cow-grid {
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap:12px; margin-bottom:24px;
+}
+.cow-card {
+  background:var(--ink3);
+  border:2px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:16px 14px;
+  cursor:pointer;
+  transition: all 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.cow-card::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(135deg, var(--gold3), transparent);
+  opacity:0; transition: opacity 0.2s;
+}
+.cow-card:hover { border-color:var(--line2); transform:translateY(-2px) }
+.cow-card.selected {
+  border-color: var(--gold);
+  background: rgba(200,168,75,0.08);
+  box-shadow: 0 0 0 1px rgba(200,168,75,0.3), var(--glow);
+}
+.cow-card.selected::after { opacity:1 }
+.cow-card.selected .cow-name { color:var(--gold2) }
+.cow-number {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; color:var(--muted); letter-spacing:1px;
+  margin-bottom:6px;
+}
+.cow-name {
+  font-size:14px; font-weight:600; color:var(--frost);
+  margin-bottom:8px; transition:color 0.2s;
+}
+.cow-badges { display:flex; flex-wrap:wrap; gap:4px; }
+.tag {
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px; letter-spacing:0.5px;
+  padding:2px 8px; border-radius:10px;
+  font-weight:500;
+}
+.tag-gold { background:rgba(200,168,75,0.15); color:var(--gold2); border:1px solid rgba(200,168,75,0.25) }
+.tag-emerald { background:rgba(45,212,160,0.12); color:var(--emerald); border:1px solid rgba(45,212,160,0.25) }
+.tag-sky { background:rgba(91,164,207,0.12); color:var(--sky); border:1px solid rgba(91,164,207,0.25) }
+.tag-rose { background:rgba(224,92,122,0.12); color:var(--rose); border:1px solid rgba(224,92,122,0.25) }
+.tag-amber { background:rgba(232,163,72,0.12); color:var(--amber); border:1px solid rgba(232,163,72,0.25) }
+.tag-violet { background:rgba(155,127,232,0.12); color:var(--violet); border:1px solid rgba(155,127,232,0.25) }
+.tag-muted { background:rgba(107,127,168,0.1); color:var(--muted); border:1px solid rgba(107,127,168,0.2) }
+
+/* ── SELECTED COW PROFILE ── */
+.cow-profile {
+  display:none;
+  animation: slideIn 0.35s ease;
+}
+.cow-profile.visible { display:block }
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(12px) }
+  to   { opacity:1; transform:translateY(0) }
+}
+.profile-grid {
+  display:grid; grid-template-columns: 1fr 2fr; gap:24px;
+}
+.profile-card {
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:24px;
+}
+.profile-name {
+  font-family:'Playfair Display',serif;
+  font-size:28px; color:var(--frost2);
+  margin-bottom:4px;
+}
+.profile-id {
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; color:var(--muted); letter-spacing:1.5px;
+  margin-bottom:16px;
+}
+.profile-section { margin-bottom:16px }
+.profile-section-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--dim); margin-bottom:8px;
+}
+.metric-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 0;
+  border-bottom:1px solid rgba(35,45,69,0.6);
+}
+.metric-row:last-child { border-bottom:none }
+.metric-key { font-size:12px; color:var(--muted) }
+.metric-val { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500 }
+.metric-val.pos { color:var(--emerald) }
+.metric-val.neg { color:var(--rose) }
+.metric-val.neu { color:var(--frost2) }
+.metric-val.warn { color:var(--amber) }
+.alert-box {
+  background: rgba(224,92,122,0.08);
+  border: 1px solid rgba(224,92,122,0.2);
+  border-radius:8px;
+  padding:12px 16px;
+  margin-top:12px;
+  font-size:12px; color:var(--rose); line-height:1.5;
+}
+.alert-box.warn {
+  background: rgba(232,163,72,0.08);
+  border-color: rgba(232,163,72,0.2);
+  color:var(--amber);
+}
+.alert-box.ok {
+  background: rgba(45,212,160,0.08);
+  border-color: rgba(45,212,160,0.2);
+  color:var(--emerald);
+}
+
+/* ── LINEAR BAR ── */
+.linear-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px }
+.linear-row { display:flex; align-items:center; gap:8px }
+.linear-label { font-size:10px; color:var(--muted); min-width:110px; font-family:'JetBrains Mono',monospace }
+.linear-bar { flex:1; height:5px; background:var(--line); border-radius:3px; overflow:hidden }
+.linear-fill { height:100%; border-radius:3px }
+.linear-val { font-size:10px; font-family:'JetBrains Mono',monospace; min-width:18px; text-align:right }
+
+/* ── BULL DATABASE ── */
+.filter-row {
+  display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;
+  align-items:center;
+}
+.filter-group { display:flex; flex-direction:column; gap:4px }
+.filter-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--muted);
+}
+select, input {
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-radius:8px;
+  color:var(--frost);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  padding:8px 12px;
+  outline:none;
+  cursor:pointer;
+  transition: border-color 0.2s;
+}
+select:focus, input:focus { border-color:var(--gold) }
+select option { background:var(--ink2) }
+
+/* ── BULL CARDS ── */
+.bull-list { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap:16px }
+.bull-card {
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:20px;
+  cursor:pointer;
+  transition: all 0.25s;
+  position:relative;
+}
+.bull-card:hover {
+  border-color:var(--line2);
+  transform:translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+.bull-card.top-pick {
+  border-color: rgba(200,168,75,0.4);
+  background: rgba(200,168,75,0.04);
+}
+.top-pick-badge {
+  position:absolute; top:12px; right:12px;
+  background: linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--ink);
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px; font-weight:600;
+  letter-spacing:1px; text-transform:uppercase;
+  padding:3px 8px; border-radius:10px;
+}
+.bull-name {
+  font-family:'Playfair Display',serif;
+  font-size:18px; color:var(--frost);
+  margin-bottom:2px;
+}
+.bull-reg {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; color:var(--muted); letter-spacing:1px;
+  margin-bottom:14px;
+}
+.bull-metrics {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:8px; margin-bottom:14px;
+}
+.bm {
+  background:var(--ink2);
+  border-radius:8px; padding:8px;
+  text-align:center;
+}
+.bm-label { font-size:8px; color:var(--dim); letter-spacing:1px; font-family:'JetBrains Mono',monospace; margin-bottom:4px }
+.bm-val { font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600 }
+.bull-strengths { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px }
+.bull-compatibility {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  background:var(--ink2);
+  border-radius:8px;
+  font-size:12px;
+}
+.compat-label { color:var(--muted); font-size:11px }
+.compat-bar { flex:1; height:6px; background:var(--line); border-radius:3px; overflow:hidden }
+.compat-fill { height:100%; border-radius:3px; transition: width 1.2s ease }
+.compat-score {
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px; font-weight:600; min-width:36px; text-align:right;
+}
+
+/* ── RECOMMENDATION RESULT ── */
+.result-panel {
+  display:none;
+  animation: slideIn 0.4s ease;
+}
+.result-panel.visible { display:block }
+.result-hero {
+  background: linear-gradient(135deg, rgba(200,168,75,0.08), rgba(200,168,75,0.02));
+  border:1px solid rgba(200,168,75,0.25);
+  border-radius:var(--radius);
+  padding:32px;
+  margin-bottom:24px;
+  text-align:center;
+  position:relative; overflow:hidden;
+}
+.result-hero::before {
+  content:'';
+  position:absolute; top:-50%; left:50%; transform:translateX(-50%);
+  width:300px; height:300px;
+  background: radial-gradient(circle, rgba(200,168,75,0.1), transparent 70%);
+  pointer-events:none;
+}
+.result-hero-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:3px; color:var(--gold);
+  margin-bottom:12px;
+}
+.result-hero h2 {
+  font-family:'Playfair Display',serif;
+  font-size:36px; color:var(--frost);
+  margin-bottom:8px;
+}
+.result-hero-sub {
+  font-size:14px; color:var(--muted);
+}
+.score-ring {
+  width:100px; height:100px;
+  border-radius:50%;
+  border:3px solid var(--line);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column;
+  margin:16px auto;
+  position:relative;
+}
+.score-ring-val {
+  font-family:'Playfair Display',serif;
+  font-size:28px; color:var(--gold2);
+  line-height:1;
+}
+.score-ring-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px; color:var(--muted); letter-spacing:1px;
+  margin-top:2px;
+}
+.result-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px }
+.result-block {
+  background:var(--ink3); border:1px solid var(--line);
+  border-radius:var(--r-sm); padding:20px;
+}
+.result-block-title {
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:14px;
+}
+.offspring-trait {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(35,45,69,0.6);
+}
+.offspring-trait:last-child { border-bottom:none }
+.ot-name { font-size:12px; color:var(--muted); flex:1 }
+.ot-bar { width:80px; height:4px; background:var(--line); border-radius:2px; overflow:hidden }
+.ot-fill { height:100%; border-radius:2px }
+.ot-val { font-family:'JetBrains Mono',monospace; font-size:11px; min-width:40px; text-align:right }
+.warnings-list { display:flex; flex-direction:column; gap:8px }
+.warning-item {
+  display:flex; gap:10px; align-items:flex-start;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:12px; line-height:1.5;
+}
+.warning-item.error {
+  background:rgba(224,92,122,0.08);
+  border:1px solid rgba(224,92,122,0.2);
+  color:var(--rose);
+}
+.warning-item.caution {
+  background:rgba(232,163,72,0.08);
+  border:1px solid rgba(232,163,72,0.2);
+  color:var(--amber);
+}
+.warning-item.good {
+  background:rgba(45,212,160,0.08);
+  border:1px solid rgba(45,212,160,0.2);
+  color:var(--emerald);
+}
+.warning-icon { font-size:14px; margin-top:1px; flex-shrink:0 }
+
+/* ── CHART AREA ── */
+.chart-wrap { position:relative; height:260px }
+.chart-wrap-sm { position:relative; height:200px }
+
+/* ── RANKING TABLE ── */
+.ranking-row {
+  display:flex; align-items:center; gap:14px;
+  padding:12px 0;
+  border-bottom:1px solid rgba(35,45,69,0.5);
+  cursor:pointer;
+  transition: background 0.15s;
+  border-radius:6px;
+  padding:12px 10px;
+}
+.ranking-row:hover { background:rgba(255,255,255,0.02) }
+.ranking-num {
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px; color:var(--dim); min-width:20px;
+}
+.ranking-num.gold { color:var(--gold) }
+.ranking-name { font-size:14px; color:var(--frost); flex:1; font-weight:500 }
+.ranking-score {
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px; font-weight:600;
+}
+
+/* ── TABS ── */
+.tabs { display:flex; gap:0; margin-bottom:28px; border-bottom:1px solid var(--line) }
+.tab {
+  padding:12px 20px;
+  font-size:12px; font-weight:500;
+  color:var(--muted); cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.2s;
+  letter-spacing:0.5px;
+}
+.tab:hover { color:var(--frost) }
+.tab.active { color:var(--gold); border-bottom-color:var(--gold) }
+
+/* ── INBREEDING CHECK ── */
+.inbreed-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px }
+.inbreed-pair {
+  background:var(--ink3); border:1px solid var(--line);
+  border-radius:var(--r-sm); padding:16px;
+  display:flex; align-items:center; gap:14px;
+}
+.inbreed-icon { font-size:24px }
+.inbreed-name { font-size:13px; font-weight:600; color:var(--frost); margin-bottom:4px }
+.inbreed-detail { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace }
+
+/* ── TOOLTIPS ── */
+.tooltip-wrap { position:relative; display:inline-block }
+.tooltip-wrap:hover .tooltip-box { opacity:1; pointer-events:auto; transform:translateY(0) }
+.tooltip-box {
+  position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%) translateY(4px);
+  background:var(--ink2); border:1px solid var(--line2);
+  border-radius:8px; padding:8px 12px;
+  font-size:11px; color:var(--frost2); white-space:nowrap;
+  opacity:0; pointer-events:none;
+  transition:all 0.2s; z-index:50;
+  box-shadow:var(--shadow);
+}
+
+/* ── BUTTON ── */
+.btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 22px;
+  border-radius:10px; border:none;
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:all 0.2s;
+  letter-spacing:0.3px;
+}
+.btn-gold {
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--ink); box-shadow:0 4px 16px rgba(200,168,75,0.3);
+}
+.btn-gold:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(200,168,75,0.4) }
+.btn-outline {
+  background:transparent; color:var(--frost);
+  border:1px solid var(--line2);
+}
+.btn-outline:hover { border-color:var(--gold); color:var(--gold) }
+.btn-sm { padding:7px 14px; font-size:11px }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+  z-index:200; align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex }
+.modal {
+  background:var(--ink2); border:1px solid var(--line2);
+  border-radius:var(--radius); padding:32px;
+  max-width:700px; width:90%;
+  max-height:80vh; overflow-y:auto;
+  animation:slideIn 0.3s ease;
+  box-shadow:var(--shadow);
+}
+.modal-title {
+  font-family:'Playfair Display',serif;
+  font-size:24px; color:var(--frost);
+  margin-bottom:20px;
+}
+.modal-close {
+  position:absolute; top:20px; right:20px;
+  background:none; border:none; color:var(--muted);
+  font-size:20px; cursor:pointer;
+  transition:color 0.2s;
+}
+.modal-close:hover { color:var(--frost) }
+
+/* ── DIVIDER ── */
+.divider { height:1px; background:var(--line); margin:24px 0 }
+.gap { height:24px }
+
+/* ── UTIL ── */
+.mono { font-family:'JetBrains Mono',monospace }
+.serif { font-family:'Playfair Display',serif }
+.text-gold { color:var(--gold) }
+.text-emerald { color:var(--emerald) }
+.text-rose { color:var(--rose) }
+.text-amber { color:var(--amber) }
+.text-muted { color:var(--muted) }
+.text-sky { color:var(--sky) }
+.flex { display:flex; align-items:center; gap:12px }
+.flex-between { display:flex; align-items:center; justify-content:space-between }
+.overflow-x { overflow-x:auto }
+.hidden { display:none }
+.section-sep {
+  display:flex; align-items:center; gap:16px;
+  margin:36px 0 28px;
+}
+.section-sep-label {
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--dim); white-space:nowrap;
+}
+.section-sep-line { flex:1; height:1px; background:var(--line) }
+
+@media(max-width:900px){
+  .header { padding:0 20px }
+  .main { padding:20px }
+  .hero h1 { font-size:36px }
+  .steps { grid-template-columns:1fr }
+  .profile-grid, .result-grid, .inbreed-grid { grid-template-columns:1fr }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="brand-icon">🧬</div>
+    <div>
+      <div class="brand-name">GeneMatch</div>
+      <div class="brand-sub">Sistema de Cruce Genético</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="herd-badge">🐄 Hato Mareiwa · Holstein & Ayrshire</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Mejoramiento Genético Bovino</div>
+    <h1>Cruce Inteligente<br>para tu Hato</h1>
+    <p>Selecciona una vaca del hato, analiza sus fortalezas y debilidades genómicas y morfológicas, y obtén las mejores recomendaciones de toros para el próximo cruce.</p>
+  </section>
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">PASO 01</div>
+      <div class="step-title">Seleccionar la Vaca</div>
+      <div class="step-desc">Elige la hembra que deseas cruzar. Verás su perfil genómico, evaluación lineal y alertas de haplotipos.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">PASO 02</div>
+      <div class="step-title">Explorar Toros</div>
+      <div class="step-desc">Filtra el banco de toros por mérito neto, rasgos de ubre, patas, producción y compatibilidad haplotípica.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">PASO 03</div>
+      <div class="step-title">Evaluar el Cruce</div>
+      <div class="step-desc">Obtén el score de compatibilidad, proyección de la cría, advertencias de consanguinidad y plan de mejora.</div>
+    </div>
+  </div>
+
+  <!-- ─── PASO 1: SELECCIÓN DE VACA ─── -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title"><span class="panel-dot"></span>PASO 1 — SELECCIÓN DE LA VACA</div>
+      <div id="selectedCowBadge" class="hidden">
+        <span class="tag tag-gold" id="selectedCowBadgeText"></span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Vacas Holstein disponibles para cruce en el Hato Mareiwa:</p>
+      <div class="cow-grid" id="cowGrid"></div>
+
+      <!-- PERFIL DE VACA SELECCIONADA -->
+      <div class="cow-profile" id="cowProfile">
+        <div class="divider"></div>
+        <div class="profile-grid">
+          <!-- LEFT: INFO GENERAL -->
+          <div>
+            <div class="profile-card">
+              <div class="profile-name" id="pName">—</div>
+              <div class="profile-id" id="pId">—</div>
+
+              <div class="profile-section">
+                <div class="profile-section-label">Genómica</div>
+                <div class="metric-row">
+                  <div class="metric-key">MN$ (Mérito Neto)</div>
+                  <div class="metric-val" id="pMN">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">GM$</div>
+                  <div class="metric-val" id="pGM">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">CM$</div>
+                  <div class="metric-val" id="pCM">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">Leche (lbs)</div>
+                  <div class="metric-val" id="pLeche">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">% Proteína</div>
+                  <div class="metric-val" id="pProt">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">% Grasa</div>
+                  <div class="metric-val" id="pGrasa">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">SCS (Células Somáticas)</div>
+                  <div class="metric-val" id="pSCS">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">PL (Longevidad Productiva)</div>
+                  <div class="metric-val" id="pPL">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">LIV (Facilidad de Parto)</div>
+                  <div class="metric-val" id="pLIV">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">DPR (Tasa de Preñez)</div>
+                  <div class="metric-val" id="pDPR">—</div>
+                </div>
+              </div>
+
+              <div class="profile-section">
+                <div class="profile-section-label">Calidad Proteína &amp; Haplotipos</div>
+                <div class="metric-row">
+                  <div class="metric-key">Beta-caseína (b-CN)</div>
+                  <div class="metric-val" id="pBCN">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">Kappa-caseína (k-CN)</div>
+                  <div class="metric-val" id="pKCN">—</div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-key">Haplotipos</div>
+                  <div class="metric-val" id="pHap" style="font-size:10px">—</div>
+                </div>
+              </div>
+
+              <div id="hapAlerts"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT: LINEAL + CHARTS -->
+          <div>
+            <div class="profile-card" style="margin-bottom:16px">
+              <div class="profile-section-label" style="margin-bottom:12px">Evaluación Lineal Morfológica</div>
+              <div class="linear-grid" id="linearGrid"></div>
+            </div>
+            <div class="profile-card">
+              <div class="profile-section-label" style="margin-bottom:12px">Perfil Genómico vs. Promedio Hato</div>
+              <div class="chart-wrap-sm"><canvas id="radarCow"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑAS DE TOROS -->
+        <div class="section-sep">
+          <div class="section-sep-line"></div>
+          <div class="section-sep-label">PASO 2 — BANCO DE TOROS</div>
+          <div class="section-sep-line"></div>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <div class="filter-label">Ordenar por</div>
+            <select id="sortBulls" onchange="renderBulls()">
+              <option value="compat">Compatibilidad</option>
+              <option value="mn">MN$ Mérito Neto</option>
+              <option value="ubre">Ubre (UDC)</option>
+              <option value="patas">Patas (FLC)</option>
+              <option value="ptat">PTAT (Tipo)</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <div class="filter-label">Beta-Caseína</div>
+            <select id="filterBCN" onchange="renderBulls()">
+              <option value="all">Todos</option>
+              <option value="a2">Solo A2A2</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <div class="filter-label">Haplotipos seguros</div>
+            <select id="filterHap" onchange="renderBulls()">
+              <option value="all">Todos</option>
+              <option value="free">Libre de riesgo</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <div class="filter-label">MN$ mínimo</div>
+            <input type="number" id="filterMN" value="100" style="width:90px" oninput="renderBulls()">
+          </div>
+          <div style="margin-left:auto">
+            <button class="btn btn-outline btn-sm" onclick="resetFilters()">↺ Limpiar filtros</button>
+          </div>
+        </div>
+
+        <div class="bull-list" id="bullList"></div>
+
+        <!-- RESULTADOS DE CRUCE -->
+        <div class="result-panel" id="resultPanel">
+          <div class="section-sep">
+            <div class="section-sep-line"></div>
+            <div class="section-sep-label">PASO 3 — ANÁLISIS DE CRUCE</div>
+            <div class="section-sep-line"></div>
+          </div>
+
+          <div class="result-hero">
+            <div class="result-hero-label">RECOMENDACIÓN DE CRUCE</div>
+            <h2 id="rTitle">—</h2>
+            <div class="result-hero-sub" id="rSub">—</div>
+            <div class="score-ring" id="scoreRing">
+              <div class="score-ring-val" id="rScore">—</div>
+              <div class="score-ring-label">SCORE</div>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px" id="rTags"></div>
+          </div>
+
+          <div class="result-grid">
+            <!-- PROYECCIÓN CRÍA -->
+            <div class="result-block">
+              <div class="result-block-title">Proyección de la Cría</div>
+              <div id="offspringTraits"></div>
+            </div>
+            <!-- RASGOS MEJORADOS -->
+            <div class="result-block">
+              <div class="result-block-title">Rasgos Objetivo Mejorados</div>
+              <div class="chart-wrap-sm"><canvas id="chartOffspring"></canvas></div>
+            </div>
+            <!-- ALERTAS -->
+            <div class="result-block">
+              <div class="result-block-title">Alertas &amp; Verificaciones</div>
+              <div class="warnings-list" id="warningsList"></div>
+            </div>
+          </div>
+
+          <!-- PLAN DE MEJORA -->
+          <div class="panel" style="margin-bottom:0">
+            <div class="panel-head">
+              <div class="panel-title"><span class="panel-dot" style="background:var(--emerald);box-shadow:0 0 8px rgba(45,212,160,0.6)"></span>PLAN DE MEJORAMIENTO GENÉTICO — PRÓXIMAS 3 GENERACIONES</div>
+            </div>
+            <div class="panel-body" id="improvePlan"></div>
+          </div>
+        </div>
+
+      </div><!-- /cow-profile -->
+    </div>
+  </div>
+
+  <!-- RANKING GENERAL -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title"><span class="panel-dot" style="background:var(--sky)"></span>RANKING GENÉTICO DEL HATO HOLSTEIN</div>
+    </div>
+    <div class="panel-body">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('tabCows',this)">Vacas por MN$</div>
+        <div class="tab" onclick="switchTab('tabBcn',this)">Estado Beta-Caseína</div>
+        <div class="tab" onclick="switchTab('tabLineal',this)">Puntaje Lineal</div>
+        <div class="tab" onclick="switchTab('tabHap',this)">Análisis Haplotipos</div>
+      </div>
+
+      <div id="tabCows">
+        <div id="rankingCows"></div>
+      </div>
+      <div id="tabBcn" class="hidden">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div>
+            <div class="profile-section-label" style="margin-bottom:12px">Estado b-CN por Animal</div>
+            <div id="bcnList"></div>
+          </div>
+          <div>
+            <div class="chart-wrap"><canvas id="chartBCN"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div id="tabLineal" class="hidden">
+        <div class="chart-wrap-sm"><canvas id="chartLinealHerd"></canvas></div>
+      </div>
+      <div id="tabHap" class="hidden">
+        <div id="hapAnalysis"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA — HATO MAREIWA HOLSTEIN
+// ═══════════════════════════════════════════════
+
+const HERD = [
+  {
+    id:'12', nombre:'Silvana', codigo:'HOL-012',
+    estado:'Lactancia', edad:4.78, padre:'Rusty-Red', madre:'Silvia',
+    produccionActual:36.6,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:8,profundidad:6,carLechero:7,anguloAnca:7,anchoAnca:7,patasLat:4,patasPost:5,anguloPezuña:5,ubreAnt:8,altoUbre:8,anchoUbre:8,ligCentral:7,profUbre:7,pezonesDel:5,pezonesTraRas:5 },
+    notas:'Alta producción sostenida. Ubre excelente morfológicamente. Sin dato genómico → evaluar.',
+    prioridad:'alta'
+  },
+  {
+    id:'13', nombre:'Jocosa', codigo:'HOL-013',
+    estado:'Lactancia', edad:4.75, padre:'Rusty-Red', madre:'Joya',
+    produccionActual:34.6,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:8,profundidad:6,carLechero:7,anguloAnca:5,anchoAnca:5,patasLat:5,patasPost:5,anguloPezuña:5,ubreAnt:4,altoUbre:4,anchoUbre:4,ligCentral:3,profUbre:4,pezonesDel:4,pezonesTraRas:4 },
+    notas:'Muy buena productora pero ubre débil. Ligar central deficiente (3). Priorizar toro con UDC alto.',
+    prioridad:'alta'
+  },
+  {
+    id:'897', nombre:'Sandy', codigo:'HOL-897',
+    estado:'Lactancia', edad:5.91, padre:'Altaextreme', madre:'Sandra',
+    produccionActual:14.0,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:7,profundidad:6,carLechero:7,anguloAnca:5,anchoAnca:7,patasLat:5,patasPost:4,anguloPezuña:5,ubreAnt:4,altoUbre:6,anchoUbre:4,ligCentral:4,profUbre:5,pezonesDel:7,pezonesTraRas:8,medPezones:5 },
+    notas:'Producción bajando. Pezones traseros abiertos (8). Edad avanzada. Evaluar próxima lactancia.',
+    prioridad:'media'
+  },
+  {
+    id:'2552', nombre:'Morada', codigo:'HOL-2552',
+    estado:'Lactancia', edad:3.75, padre:'Radar', madre:'Mosca',
+    produccionActual:29.6,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:8,profundidad:6,carLechero:7,anguloAnca:7,anchoAnca:7,patasLat:4,patasPost:5,anguloPezuña:5,ubreAnt:8,altoUbre:8,anchoUbre:8,ligCentral:7,profUbre:7,pezonesDel:5,pezonesTraRas:5 },
+    notas:'Producción creciendo. Ubre excelente. Morphología similar a Silvana. Buena candidata.',
+    prioridad:'alta'
+  },
+  {
+    id:'2578', nombre:'Nanis', codigo:'HOL-2578',
+    estado:'Lactancia', edad:3.32, padre:'Avalino-ET', madre:'Ninfa',
+    produccionActual:34.2,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:8,profundidad:7,carLechero:7,anguloAnca:5,anchoAnca:7,patasLat:4,patasPost:5,anguloPezuña:5,ubreAnt:8,altoUbre:8,anchoUbre:8,ligCentral:8,profUbre:8,pezonesDel:5,pezonesTraRas:5 },
+    notas:'Excelente ubre posterior y ligamento central (8). Producción en ascenso. Joven y prometedora.',
+    prioridad:'alta'
+  },
+  {
+    id:'2593', nombre:'Alicia', codigo:'HOL-2593',
+    estado:'Lactancia', edad:3.13, padre:'Fumagalli', madre:'Alma',
+    produccionActual:23.0,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:7,profundidad:6,carLechero:7,anguloAnca:6,anchoAnca:6,patasLat:5,patasPost:5,anguloPezuña:5,ubreAnt:8,altoUbre:8,anchoUbre:8,ligCentral:7,profUbre:7,pezonesDel:5,pezonesTraRas:5 },
+    notas:'Producción estable. Buenas características. Morfología correcta.',
+    prioridad:'media'
+  },
+  {
+    id:'102', nombre:'Mandarina', codigo:'HOL-102',
+    estado:'Lactancia', edad:null, padre:'—', madre:'—',
+    produccionActual:13.5,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:8,profundidad:7,carLechero:7,anguloAnca:5,anchoAnca:7,patasLat:4,patasPost:5,anguloPezuña:5,ubreAnt:8,altoUbre:8,anchoUbre:8,ligCentral:8,profUbre:8,pezonesDel:5,pezonesTraRas:5 },
+    notas:'Ubre lineal sobresaliente. Sin genómica ni pedigree completo. Priorizar evaluación.',
+    prioridad:'alta'
+  },
+  {
+    id:'105', nombre:'Diana', codigo:'HOL-105',
+    estado:'Lactancia', edad:null, padre:'—', madre:'—',
+    produccionActual:19.0,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:7,profundidad:7,carLechero:7,anguloAnca:5,anchoAnca:7,patasLat:5,patasPost:4,anguloPezuña:5,ubreAnt:4,altoUbre:6,anchoUbre:4,ligCentral:4,profUbre:5,pezonesDel:7,pezonesTraRas:8 },
+    notas:'Producción decreciente. Pezones traseros abiertos (8). Ubre anterior débil (4). Usar toro con alto UDC.',
+    prioridad:'alta'
+  },
+  {
+    id:'110', nombre:'Xiomara', codigo:'HOL-110',
+    estado:'Lactancia', edad:null, padre:'—', madre:'—',
+    produccionActual:30.0,
+    gen:{ mn:null, gm:null, cm:null, leche:null, prot:null, grasa:null, scs:null, pl:null, liv:null, dpr:null, ptat:null, udc:null, flc:null },
+    bcn:'?', kcn:'?', hap:[],
+    lineal:{ estatura:6,fortaleza:7,profundidad:6,carLechero:7,anguloAnca:7,anchoAnca:6,patasLat:5,patasPost:4,anguloPezuña:5,ubreAnt:7,altoUbre:7,anchoUbre:7,ligCentral:6,profUbre:7,pezonesDel:5,pezonesTraRas:5 },
+    notas:'Buena producción. Conformación correcta. Buena candidata a evaluación genómica.',
+    prioridad:'media'
+  },
+  // NOVILLAS CON GENÓMICA
+  {
+    id:'CAΩ', nombre:'Canela', codigo:'HOCOL0000NL050249',
+    estado:'Novilla', edad:1.21, padre:'Zooty', madre:'Cata',
+    produccionActual:null,
+    gen:{ mn:298, gm:294, cm:306, leche:334, prot:0.02, grasa:0.02, scs:2.95, pl:1.9, liv:1.7, dpr:0.0, ptat:-0.63, udc:-1.13, flc:-0.80 },
+    bcn:'A2/A2', kcn:'AB', hap:['HH1T','HH2T','HH3T','HH4T','HH5T','HH6T'],
+    lineal:null,
+    notas:'MEJOR MN$ DEL HATO (298, Top 76% nacional). Portadora de todos los HH. Usar toro LIBRE de HH. A2A2.',
+    prioridad:'critica'
+  },
+  {
+    id:'MOL', nombre:'Molly', codigo:'HOCOL0000NL050250',
+    estado:'Novilla', edad:1.27, padre:'Zooty', madre:'Morada',
+    produccionActual:null,
+    gen:{ mn:238, gm:237, cm:270, leche:-355, prot:0.09, grasa:0.20, scs:3.02, pl:-0.1, liv:0.2, dpr:-0.7, ptat:-0.36, udc:-0.49, flc:-0.22 },
+    bcn:'A2/A2', kcn:'BB', hap:['HH1T','HH2T','HH3T','HH4T','HH5T','HH6T'],
+    lineal:null,
+    notas:'MN$238. Grasa excepcional (+0.20%). Portadora todos HH. Buen potencial lechero. Toro LIBRE HH.',
+    prioridad:'alta'
+  },
+  {
+    id:'NAT', nombre:'Natacha', codigo:'HOCOL0000NL050248',
+    estado:'Novilla', edad:1.20, padre:'Zooty', madre:'Nanis',
+    produccionActual:null,
+    gen:{ mn:116, gm:104, cm:108, leche:2459, prot:-0.02, grasa:0.06, scs:3.10, pl:-0.1, liv:-1.0, dpr:-0.9, ptat:-0.87, udc:-0.82, flc:-0.80 },
+    bcn:'A2/A2', kcn:'AB', hap:['HH1T','HH2T','HH3T','HH4T','HH5T','HH6T'],
+    lineal:null,
+    notas:'Alta producción genómica (+2459 lbs). PTAT/UDC negativos — ubre morfológica preocupante. Toro con UDC alto y LIBRE HH.',
+    prioridad:'alta'
+  },
+  {
+    id:'MCAR', nombre:'Macarena', codigo:'HOCOLANTA00060002',
+    estado:'Leche', edad:0.56, padre:'Etowah-red', madre:'Mandala',
+    produccionActual:null,
+    gen:{ mn:93, gm:83, cm:90, leche:301, prot:-0.01, grasa:-0.06, scs:3.04, pl:1.7, liv:0.6, dpr:0.3, ptat:0.38, udc:0.01, flc:0.13 },
+    bcn:'A2/A2', kcn:'AB', hap:['HH3T','HH4T','HH5T'],
+    lineal:null,
+    notas:'MN$ bajo (93). PTAT positivo y longevidad buena. Portadora HH3,4,5. Usar toro libre HH3/4/5.',
+    prioridad:'media'
+  },
+];
+
+// ═══════════════════════════════════════════════
+//  BANCO DE TOROS — Base técnica HO internacional
+// ═══════════════════════════════════════════════
+
+const BULLS = [
+  {
+    reg:'HO840003234511423', nombre:'AltaZazzle', empresa:'Alta Genetics',
+    mn:850, gm:820, cm:880, leche:1450, prot:0.08, grasa:0.12, scs:2.75,
+    pl:4.2, liv:2.1, dpr:2.3, hcr:1.8, ccr:2.0, sce:2.1,
+    ptat:1.85, udc:2.10, flc:1.90, sta:1.50, dfm:0.90,
+    bcn:'A2A2', kcn:'BB',
+    hap:[], // libre todos
+    strengths:['UDC superior','Alta longevidad','A2A2','Fácil parto'],
+    description:'Toro élite para ubre y longevidad. Ideal para vacas con ubre débil y baja vida productiva.',
+    available:true
+  },
+  {
+    reg:'HO840003228352905', nombre:'Winfield', empresa:'Semex',
+    mn:720, gm:700, cm:745, leche:1820, prot:0.05, grasa:0.08, scs:2.88,
+    pl:3.8, liv:1.9, dpr:1.8, hcr:1.5, ccr:1.6, sce:1.8,
+    ptat:1.20, udc:1.65, flc:1.30, sta:1.10, dfm:0.70,
+    bcn:'A2A2', kcn:'AB',
+    hap:['HH2T'], // portador HH2
+    strengths:['Alta producción leche','Buena ubre','A2A2','DPR positivo'],
+    description:'Excelente productor. Portador HH2T — precaución con hembras HH2T.',
+    available:true
+  },
+  {
+    reg:'HO840003215425491', nombre:'Padre Zooty', empresa:'Colanta / ABS',
+    mn:310, gm:305, cm:320, leche:290, prot:0.03, grasa:0.04, scs:2.90,
+    pl:2.1, liv:1.5, dpr:0.5, hcr:0.8, ccr:1.0, sce:1.5,
+    ptat:-0.20, udc:-0.40, flc:-0.30, sta:-0.10, dfm:0.20,
+    bcn:'A2A2', kcn:'BB',
+    hap:['HH1T','HH2T','HH3T','HH4T','HH5T','HH6T'],
+    strengths:['Conocido en el hato','Toro usado previo'],
+    description:'⚠ YA ES PADRE de Canela, Molly y Natacha. NO usar en las mismas o sus descendientes directas.',
+    available:false // marcado como no disponible por consanguinidad en hato
+  },
+  {
+    reg:'HO840003247892345', nombre:'Siemers RZB Achiever', empresa:'Select Sires',
+    mn:780, gm:755, cm:810, leche:950, prot:0.10, grasa:0.15, scs:2.72,
+    pl:5.1, liv:2.5, dpr:2.8, hcr:2.2, ccr:2.5, sce:1.9,
+    ptat:0.95, udc:1.45, flc:0.80, sta:1.20, dfm:0.60,
+    bcn:'A2A2', kcn:'AB',
+    hap:[], // libre todos
+    strengths:['Longevidad excepcional','DPR alto','Libre HH','SCS excelente'],
+    description:'El mejor para fertilidad y longevidad. Grasa y proteína superiores. Ideal para hembras portadoras HH.',
+    available:true
+  },
+  {
+    reg:'HO840003234801267', nombre:'Pine-TRee Crush', empresa:'CRV',
+    mn:680, gm:658, cm:705, leche:2100, prot:0.06, grasa:0.05, scs:2.95,
+    pl:2.8, liv:1.2, dpr:0.9, hcr:0.5, ccr:0.8, sce:1.6,
+    ptat:0.45, udc:0.85, flc:0.40, sta:0.80, dfm:0.30,
+    bcn:'A1A2', kcn:'AB',
+    hap:[], // libre todos
+    strengths:['Máxima producción leche','Libre HH','Buena ubre'],
+    description:'Altísima producción de leche. A1A2 — solo usar en hembras A2A2 para obtener A2 en cría.',
+    available:true
+  },
+  {
+    reg:'HO840003258900112', nombre:'AltaMeteor', empresa:'Alta Genetics',
+    mn:920, gm:895, cm:950, leche:1200, prot:0.12, grasa:0.18, scs:2.65,
+    pl:5.8, liv:3.0, dpr:3.5, hcr:2.8, ccr:3.0, sce:2.0,
+    ptat:2.10, udc:2.40, flc:2.10, sta:1.80, dfm:1.20,
+    bcn:'A2A2', kcn:'BB',
+    hap:[], // libre todos
+    strengths:['MN$ top','Fertilidad excepcional','PTAT/UDC líderes','A2A2','SCS bajo','Libre HH'],
+    description:'Elite mundial. Ubre, fertilidad y producción en equilibrio perfecto. El toro de referencia para el hato.',
+    available:true
+  },
+  {
+    reg:'HO840003226802891', nombre:'Sandy-Valley Chrome', empresa:'Accelerated Genetics',
+    mn:615, gm:590, cm:640, leche:800, prot:0.07, grasa:0.11, scs:2.82,
+    pl:3.5, liv:1.8, dpr:1.5, hcr:1.2, ccr:1.4, sce:1.7,
+    ptat:1.55, udc:1.90, flc:1.60, sta:1.30, dfm:0.80,
+    bcn:'A2A2', kcn:'AB',
+    hap:['HH3T'],
+    strengths:['PTAT/UDC alto','A2A2','Buen tipo'],
+    description:'Excelente conformación y ubre. Portador HH3T — precaución con Macarena, Natacha y Canela.',
+    available:true
+  },
+  {
+    reg:'HO840003199682143', nombre:'OCD Outlander', empresa:'Semex',
+    mn:540, gm:518, cm:565, leche:1650, prot:0.04, grasa:0.07, scs:3.05,
+    pl:2.2, liv:1.0, dpr:0.5, hcr:0.3, ccr:0.5, sce:1.5,
+    ptat:0.20, udc:0.60, flc:0.30, sta:0.50, dfm:0.20,
+    bcn:'A1A2', kcn:'BB',
+    hap:[], // libre todos
+    strengths:['Alta producción','Libre HH','Rusticidad'],
+    description:'Buen productor de leche. A1A2 — usar solo en A2A2 para mantener proporción. Fertilidad moderada.',
+    available:true
+  },
+  {
+    reg:'HO840003262174509', nombre:'Progenesis Rubicon', empresa:'Semex',
+    mn:760, gm:735, cm:790, leche:680, prot:0.11, grasa:0.16, scs:2.68,
+    pl:4.6, liv:2.4, dpr:2.6, hcr:2.0, ccr:2.2, sce:1.8,
+    ptat:1.40, udc:1.75, flc:1.50, sta:1.20, dfm:0.90,
+    bcn:'A2A2', kcn:'AB',
+    hap:[], // libre todos
+    strengths:['Grasa y proteína altos','A2A2','Longevidad','Libre HH','DPR alto'],
+    description:'Equilibrio perfecto entre composición de leche, fertilidad y longevidad. Libre de todos los haplotipos de riesgo.',
+    available:true
+  },
+  {
+    reg:'HO840003245100678', nombre:'Bomaz Altamontoya', empresa:'Alta Genetics',
+    mn:830, gm:808, cm:855, leche:1350, prot:0.09, grasa:0.14, scs:2.78,
+    pl:4.8, liv:2.8, dpr:2.9, hcr:2.4, ccr:2.6, sce:1.9,
+    ptat:1.70, udc:2.00, flc:1.80, sta:1.50, dfm:1.00,
+    bcn:'A2A2', kcn:'BB',
+    hap:[], // libre todos
+    strengths:['Top DPR','UDC alto','A2A2 BB','Libre HH','Longevidad'],
+    description:'Top en fertilidad y ubre. k-CN BB ideal para queso. El mejor candidato para hembras con problemas reproductivos.',
+    available:true
+  },
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let selectedCow = null;
+let selectedBull = null;
+let radarChart = null;
+let offspringChart = null;
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderCowGrid();
+  renderRanking();
+  renderBCNTab();
+  renderLinealHerd();
+  renderHapTab();
+  initBCNChart();
+});
+
+// ═══════════════════════════════════════════════
+//  COW GRID
+// ═══════════════════════════════════════════════
+function renderCowGrid() {
+  const grid = document.getElementById('cowGrid');
+  grid.innerHTML = '';
+  HERD.forEach(cow => {
+    const prioColor = { critica:'tag-rose', alta:'tag-gold', media:'tag-sky' }[cow.prioridad] || 'tag-muted';
+    const prioLabel = { critica:'🔴 Crítica', alta:'🟡 Alta', media:'🔵 Media' }[cow.prioridad] || '';
+    const genTag = cow.gen.mn !== null ? `<span class="tag tag-emerald">MN$${cow.gen.mn}</span>` : '';
+    const bcnTag = cow.bcn !== '?' ? `<span class="tag ${cow.bcn.includes('A2/A2') || cow.bcn === 'A2A2' ? 'tag-emerald':'tag-amber'}">${cow.bcn}</span>` : '';
+    const hapWarn = cow.hap.length > 0 ? '<span class="tag tag-rose">⚠ HH</span>' : '';
+    const prodTag = cow.produccionActual ? `<span class="tag tag-sky">${cow.produccionActual}L</span>` : '';
+
+    grid.innerHTML += `
+      <div class="cow-card" id="cow-${cow.id}" onclick="selectCow('${cow.id}')">
+        <div class="cow-number">${cow.id} · ${cow.estado}</div>
+        <div class="cow-name">${cow.nombre}</div>
+        <div class="cow-badges">
+          <span class="tag ${prioColor}">${prioLabel}</span>
+          ${genTag}${bcnTag}${hapWarn}${prodTag}
+        </div>
+      </div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SELECT COW
+// ═══════════════════════════════════════════════
+function selectCow(id) {
+  document.querySelectorAll('.cow-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('cow-'+id).classList.add('selected');
+  selectedCow = HERD.find(c => c.id === id);
+  selectedBull = null;
+
+  document.getElementById('selectedCowBadge').classList.remove('hidden');
+  document.getElementById('selectedCowBadgeText').textContent = selectedCow.nombre;
+
+  populateCowProfile(selectedCow);
+  document.getElementById('cowProfile').classList.add('visible');
+  document.getElementById('resultPanel').classList.remove('visible');
+
+  renderBulls();
+
+  setTimeout(() => {
+    document.getElementById('cowProfile').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 100);
+}
+
+function fmt(v, decimals=0, pos=true) {
+  if (v === null || v === undefined) return '—';
+  const n = parseFloat(v);
+  const sign = n > 0 && pos ? '+' : '';
+  return sign + n.toFixed(decimals);
+}
+
+function colorClass(v, low, high) {
+  if (v === null || v === undefined) return 'neu';
+  const n = parseFloat(v);
+  if (n >= high) return 'pos';
+  if (n <= low) return 'neg';
+  return 'warn';
+}
+
+function populateCowProfile(cow) {
+  document.getElementById('pName').textContent = cow.nombre;
+  document.getElementById('pId').textContent = cow.codigo + ' · ' + cow.estado + (cow.edad ? ` · ${cow.edad.toFixed(1)} años` : '');
+
+  const g = cow.gen;
+  const setValue = (id, v, cls) => {
+    const el = document.getElementById(id);
+    el.textContent = v;
+    if (cls) el.className = 'metric-val ' + cls;
+  };
+
+  setValue('pMN',  g.mn !== null ? `$${g.mn}` : 'Sin dato genómica', g.mn ? colorClass(g.mn, 100, 500) : 'warn');
+  setValue('pGM',  g.gm !== null ? `$${g.gm}` : '—', 'neu');
+  setValue('pCM',  g.cm !== null ? `$${g.cm}` : '—', 'neu');
+  setValue('pLeche', g.leche !== null ? fmt(g.leche,0) + ' lbs' : '—', g.leche ? colorClass(g.leche,-100,500) : 'neu');
+  setValue('pProt', g.prot !== null ? fmt(g.prot,2) + '%' : '—', g.prot ? colorClass(g.prot,-0.05,0.05) : 'neu');
+  setValue('pGrasa', g.grasa !== null ? fmt(g.grasa,2) + '%' : '—', g.grasa ? colorClass(g.grasa,-0.05,0.1) : 'neu');
+  setValue('pSCS', g.scs !== null ? g.scs.toFixed(2) : '—', g.scs ? (g.scs < 3.0 ? 'pos' : g.scs < 3.2 ? 'warn' : 'neg') : 'neu');
+  setValue('pPL', g.pl !== null ? fmt(g.pl,1) : '—', g.pl ? colorClass(g.pl, 0, 2) : 'neu');
+  setValue('pLIV', g.liv !== null ? fmt(g.liv,1) : '—', g.liv ? colorClass(g.liv, 0, 1.5) : 'neu');
+  setValue('pDPR', g.dpr !== null ? fmt(g.dpr,1) : '—', g.dpr ? colorClass(g.dpr, -0.5, 1) : 'neu');
+
+  document.getElementById('pBCN').textContent = cow.bcn;
+  document.getElementById('pBCN').className = 'metric-val ' + (cow.bcn.includes('A2/A2') || cow.bcn === 'A2A2' ? 'pos' : cow.bcn === '?' ? 'warn' : 'neg');
+  document.getElementById('pKCN').textContent = cow.kcn;
+  document.getElementById('pKCN').className = 'metric-val ' + (cow.kcn === 'BB' ? 'pos' : cow.kcn === '?' ? 'warn' : 'neu');
+  document.getElementById('pHap').textContent = cow.hap.length > 0 ? cow.hap.join(', ') : 'Ninguno confirmado';
+
+  // Haplotipo alerts
+  const hapDiv = document.getElementById('hapAlerts');
+  hapDiv.innerHTML = '';
+  if (cow.hap.length > 0) {
+    hapDiv.innerHTML = `<div class="alert-box">⚠ <strong>Portadora de haplotipos:</strong> ${cow.hap.join(', ')}<br>Usar EXCLUSIVAMENTE toros libres de estos haplotipos para evitar mortalidad embrionaria y abortos.</div>`;
+  }
+  if (cow.bcn === 'A1A2' || cow.bcn === 'A1A1') {
+    hapDiv.innerHTML += `<div class="alert-box warn">⚠ b-CN ${cow.bcn}: Usar toros A2A2 para maximizar progenie A2. Mercado premium en crecimiento.</div>`;
+  }
+  if (!cow.gen.mn) {
+    hapDiv.innerHTML += `<div class="alert-box warn">📋 Sin evaluación genómica. Se recomienda genotipar esta vaca para optimizar la selección del toro.</div>`;
+  }
+  if (cow.notas) {
+    hapDiv.innerHTML += `<div class="alert-box ok" style="background:rgba(91,164,207,0.08);border-color:rgba(91,164,207,0.2);color:var(--sky)">💡 ${cow.notas}</div>`;
+  }
+
+  // Linear evaluation
+  const linGrid = document.getElementById('linearGrid');
+  linGrid.innerHTML = '';
+  if (cow.lineal) {
+    const linItems = [
+      ['Estatura', cow.lineal.estatura, {low:5,high:7,ideal:6}],
+      ['Fortaleza', cow.lineal.fortaleza, {low:5,high:8,ideal:7}],
+      ['Profundidad', cow.lineal.profundidad, {low:5,high:7,ideal:6}],
+      ['Car. Lechero', cow.lineal.carLechero, {low:5,high:9,ideal:7}],
+      ['Ángulo Anca', cow.lineal.anguloAnca, {low:4,high:7,ideal:5}],
+      ['Ancho Anca', cow.lineal.anchoAnca, {low:5,high:8,ideal:7}],
+      ['Patas Lateral', cow.lineal.patasLat, {low:4,high:7,ideal:5}],
+      ['Patas Post.', cow.lineal.patasPost, {low:4,high:6,ideal:5}],
+      ['Ángulo Pezuña', cow.lineal.anguloPezuña, {low:4,high:6,ideal:5}],
+      ['Ubre Anterior', cow.lineal.ubreAnt, {low:6,high:9,ideal:8}],
+      ['Alto Ubre Post', cow.lineal.altoUbre, {low:6,high:9,ideal:8}],
+      ['Ancho Ubre', cow.lineal.anchoUbre, {low:6,high:9,ideal:7}],
+      ['Lig. Central', cow.lineal.ligCentral, {low:5,high:9,ideal:7}],
+      ['Prof. Ubre', cow.lineal.profUbre, {low:5,high:8,ideal:6}],
+      ['Pezones Del.', cow.lineal.pezonesDel, {low:4,high:6,ideal:5}],
+      ['Pezones Tras.', cow.lineal.pezonesTraRas, {low:4,high:6,ideal:5}],
+    ];
+    linItems.forEach(([label, val, range]) => {
+      if (!val) return;
+      const pct = (val/9*100).toFixed(0);
+      const inRange = val >= range.low && val <= range.high;
+      const color = inRange ? '#2dd4a0' : val < range.low ? '#e8a348' : '#e05c7a';
+      linGrid.innerHTML += `
+        <div class="linear-row">
+          <div class="linear-label" title="${label}">${label}</div>
+          <div class="linear-bar"><div class="linear-fill" style="width:${pct}%;background:${color}"></div></div>
+          <div class="linear-val" style="color:${color}">${val}</div>
+        </div>`;
+    });
+  } else {
+    linGrid.innerHTML = '<div style="color:var(--muted);font-size:12px;font-family:JetBrains Mono,monospace;padding:8px 0">Sin evaluación lineal disponible para esta animal.</div>';
+  }
+
+  // Radar chart
+  buildRadarChart(cow);
+}
+
+function buildRadarChart(cow) {
+  const ctx = document.getElementById('radarCow');
+  if (!ctx) return;
+  if (radarChart) radarChart.destroy();
+
+  const labels = ['MN$','Leche','%Grasa','SCS⁻¹','PL','LIV','DPR','PTAT','UDC'];
+  const avgHerd = [200, 1000, 0.08, 3.0, 2.0, 1.0, 1.0, 0.5, 0.8]; // referencias Holstein
+
+  let cowData;
+  if (cow.gen.mn !== null) {
+    cowData = [
+      Math.min(cow.gen.mn / 4, 100),
+      Math.min(Math.max(cow.gen.leche + 1000, 0) / 30, 100),
+      Math.min((cow.gen.grasa + 0.3) * 200, 100),
+      Math.min((4.0 - cow.gen.scs) * 50, 100),
+      Math.min(cow.gen.pl * 20 + 40, 100),
+      Math.min(cow.gen.liv * 30 + 40, 100),
+      Math.min(cow.gen.dpr * 20 + 40, 100),
+      cow.gen.ptat !== null ? Math.min(cow.gen.ptat * 30 + 50, 100) : 50,
+      cow.gen.udc !== null ? Math.min(cow.gen.udc * 25 + 50, 100) : 50,
+    ];
+  } else {
+    // Estimado desde lineal
+    const l = cow.lineal || {};
+    cowData = [
+      50, 60,
+      55, 60,
+      55, 55, 50,
+      l.ubreAnt ? Math.min(l.ubreAnt / 9 * 100, 100) : 50,
+      l.altoUbre ? Math.min(l.altoUbre / 9 * 100, 100) : 50,
+    ];
+  }
+
+  radarChart = new Chart(ctx, {
+    type:'radar',
+    data:{
+      labels,
+      datasets:[
+        {
+          label: cow.nombre,
+          data: cowData,
+          borderColor:'#c8a84b',
+          backgroundColor:'rgba(200,168,75,0.12)',
+          pointBackgroundColor:'#c8a84b',
+          pointRadius:4,
+        },
+        {
+          label:'Promedio HO',
+          data:[50,50,50,50,50,50,50,50,50],
+          borderColor:'rgba(107,127,168,0.4)',
+          backgroundColor:'rgba(107,127,168,0.06)',
+          pointBackgroundColor:'rgba(107,127,168,0.4)',
+          pointRadius:3,
+          borderDash:[4,4]
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#6b7fa8', font:{ family:'JetBrains Mono', size:10 }}}},
+      scales:{
+        r:{
+          grid:{ color:'rgba(35,45,69,0.8)' },
+          ticks:{ color:'#3a4a68', backdropColor:'transparent', font:{ family:'JetBrains Mono', size:9 }, stepSize:20 },
+          pointLabels:{ color:'#8fa3c8', font:{ family:'JetBrains Mono', size:10 }},
+          min:0, max:100
+        }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  COMPATIBILITY SCORE
+// ═══════════════════════════════════════════════
+function calcCompatibility(cow, bull) {
+  if (!bull.available) return { score:0, details:[] };
+  let score = 0;
+  let details = [];
+
+  // 1. HAPLOTIPO SAFETY (30 pts)
+  const hapConflict = cow.hap.filter(h => bull.hap.includes(h));
+  if (hapConflict.length === 0) {
+    score += 30;
+    details.push({ type:'good', text:'✓ Sin conflicto haplotípico' });
+  } else if (hapConflict.length <= 2) {
+    score += 5;
+    details.push({ type:'caution', text:`⚠ Comparte haplotipos: ${hapConflict.join(', ')}` });
+  } else {
+    score -= 20;
+    details.push({ type:'error', text:`✗ Alto riesgo HH: ${hapConflict.join(', ')}` });
+  }
+
+  // 2. BETA CASEÍNA (15 pts)
+  const cowA2 = cow.bcn.includes('A2');
+  const bullA2 = bull.bcn.includes('A2');
+  if (cowA2 && bullA2) { score += 15; details.push({ type:'good', text:'✓ Cruce A2×A2 — cría A2A2 100%' }); }
+  else if (bullA2) { score += 10; details.push({ type:'good', text:'✓ Toro A2A2 — cría A2 en 50%' }); }
+  else { score += 2; details.push({ type:'caution', text:'⚠ Toro A1A2 — reducirá A2 en cría' }); }
+
+  // 3. UBRE (20 pts) — compensar debilidades
+  let ubreScore = 0;
+  if (cow.lineal) {
+    const needUDC = (cow.lineal.ubreAnt < 5 || cow.lineal.ligCentral < 5 || cow.lineal.altoUbre < 5);
+    if (needUDC && bull.udc >= 1.5) ubreScore += 20;
+    else if (needUDC && bull.udc >= 0.8) ubreScore += 12;
+    else if (!needUDC && bull.udc >= 1.0) ubreScore += 15;
+    else ubreScore += 8;
+  } else {
+    ubreScore = bull.udc >= 1.5 ? 18 : bull.udc >= 0.8 ? 12 : 7;
+  }
+  score += ubreScore;
+
+  // 4. PATAS Y LOCOMOCIÓN (10 pts)
+  if (cow.lineal) {
+    const needPatas = cow.lineal.patasPost <= 4 || cow.lineal.patasLat <= 4;
+    if (needPatas && bull.flc >= 1.0) score += 10;
+    else if (bull.flc >= 0.5) score += 7;
+    else score += 4;
+  } else {
+    score += bull.flc >= 1.0 ? 8 : 5;
+  }
+
+  // 5. MÉRITO NETO (10 pts)
+  if (bull.mn >= 800) score += 10;
+  else if (bull.mn >= 600) score += 7;
+  else if (bull.mn >= 400) score += 4;
+  else score += 1;
+
+  // 6. FERTILIDAD (10 pts)
+  if (bull.dpr >= 2.5) score += 10;
+  else if (bull.dpr >= 1.5) score += 7;
+  else if (bull.dpr >= 0.5) score += 4;
+  else score += 1;
+
+  // 7. LONGEVIDAD (5 pts)
+  if (bull.pl >= 4.0) score += 5;
+  else if (bull.pl >= 2.5) score += 3;
+  else score += 1;
+
+  return { score: Math.max(0, Math.min(100, score)), details };
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER BULLS
+// ═══════════════════════════════════════════════
+function renderBulls() {
+  if (!selectedCow) return;
+  const container = document.getElementById('bullList');
+  const sortBy = document.getElementById('sortBulls').value;
+  const filterBCN = document.getElementById('filterBCN').value;
+  const filterHap = document.getElementById('filterHap').value;
+  const minMN = parseInt(document.getElementById('filterMN').value) || 0;
+
+  let bulls = BULLS.filter(b => {
+    if (filterBCN === 'a2' && !b.bcn.includes('A2')) return false;
+    if (filterHap === 'free') {
+      const conflicts = selectedCow.hap.filter(h => b.hap.includes(h));
+      if (conflicts.length > 0) return false;
+    }
+    if (b.mn < minMN) return false;
+    return true;
+  });
+
+  bulls = bulls.map(b => ({ ...b, compat: calcCompatibility(selectedCow, b) }));
+
+  bulls.sort((a, b) => {
+    if (sortBy === 'compat') return b.compat.score - a.compat.score;
+    if (sortBy === 'mn') return b.mn - a.mn;
+    if (sortBy === 'ubre') return b.udc - a.udc;
+    if (sortBy === 'patas') return b.flc - a.flc;
+    if (sortBy === 'ptat') return b.ptat - a.ptat;
+    return 0;
+  });
+
+  container.innerHTML = '';
+  if (bulls.length === 0) {
+    container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:20px;text-align:center;font-family:JetBrains Mono,monospace">No hay toros que cumplan los filtros actuales.</div>';
+    return;
+  }
+
+  bulls.forEach((bull, idx) => {
+    const isTop = idx === 0 && bull.compat.score >= 70;
+    const s = bull.compat.score;
+    const scoreColor = s >= 80 ? '#2dd4a0' : s >= 60 ? '#c8a84b' : s >= 40 ? '#e8a348' : '#e05c7a';
+    const hapOk = selectedCow.hap.filter(h => bull.hap.includes(h)).length === 0;
+    const bcnOk = bull.bcn.includes('A2');
+    const notAvail = !bull.available;
+
+    container.innerHTML += `
+      <div class="bull-card ${isTop ? 'top-pick' : ''} ${notAvail ? 'bull-disabled' : ''}" style="${notAvail ? 'opacity:0.5;pointer-events:none' : ''}" onclick="selectBull('${bull.reg}')">
+        ${isTop ? '<div class="top-pick-badge">★ TOP PICK</div>' : ''}
+        ${notAvail ? '<div class="top-pick-badge" style="background:var(--rose);color:white">⚠ No disponible</div>' : ''}
+        <div class="bull-name">${bull.nombre}</div>
+        <div class="bull-reg">${bull.reg} · ${bull.empresa}</div>
+        <div class="bull-metrics">
+          <div class="bm"><div class="bm-label">MN$</div><div class="bm-val" style="color:${bull.mn>=700?'#2dd4a0':bull.mn>=400?'#c8a84b':'#e8a348'}">${bull.mn}</div></div>
+          <div class="bm"><div class="bm-label">UDC</div><div class="bm-val" style="color:${bull.udc>=1.5?'#2dd4a0':bull.udc>=0.8?'#c8a84b':'#e05c7a'}">${bull.udc.toFixed(2)}</div></div>
+          <div class="bm"><div class="bm-label">DPR</div><div class="bm-val" style="color:${bull.dpr>=2?'#2dd4a0':bull.dpr>=1?'#c8a84b':'#e8a348'}">${bull.dpr.toFixed(1)}</div></div>
+          <div class="bm"><div class="bm-label">PL</div><div class="bm-val" style="color:${bull.pl>=4?'#2dd4a0':bull.pl>=2.5?'#c8a84b':'#e8a348'}">${bull.pl.toFixed(1)}</div></div>
+        </div>
+        <div class="bull-strengths">
+          ${bull.strengths.map(s=>`<span class="tag tag-muted">${s}</span>`).join('')}
+          ${hapOk ? '<span class="tag tag-emerald">✓ Hapl. OK</span>' : '<span class="tag tag-rose">⚠ Hapl.</span>'}
+          ${bcnOk ? `<span class="tag tag-emerald">${bull.bcn}</span>` : `<span class="tag tag-amber">${bull.bcn}</span>`}
+        </div>
+        <div class="bull-compatibility">
+          <div class="compat-label">Compatibilidad</div>
+          <div class="compat-bar"><div class="compat-fill" style="width:${s}%;background:${scoreColor}"></div></div>
+          <div class="compat-score" style="color:${scoreColor}">${s}%</div>
+        </div>
+      </div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  SELECT BULL → RESULT
+// ═══════════════════════════════════════════════
+function selectBull(reg) {
+  const bull = BULLS.find(b => b.reg === reg);
+  if (!bull || !selectedCow) return;
+  selectedBull = bull;
+
+  const compat = calcCompatibility(selectedCow, bull);
+  const s = compat.score;
+
+  document.getElementById('rTitle').textContent = `${selectedCow.nombre} × ${bull.nombre}`;
+  document.getElementById('rSub').textContent = `${bull.empresa} · ${bull.reg}`;
+  document.getElementById('rScore').textContent = s;
+
+  const ring = document.getElementById('scoreRing');
+  const scoreColor = s >= 80 ? '#2dd4a0' : s >= 60 ? '#c8a84b' : s >= 40 ? '#e8a348' : '#e05c7a';
+  ring.style.borderColor = scoreColor;
+  ring.style.boxShadow = `0 0 20px ${scoreColor}40`;
+
+  // Tags
+  const tagsDiv = document.getElementById('rTags');
+  tagsDiv.innerHTML = '';
+  const hapOk = selectedCow.hap.filter(h => bull.hap.includes(h)).length === 0;
+  if (hapOk) tagsDiv.innerHTML += '<span class="tag tag-emerald">✓ Sin conflicto HH</span>';
+  else tagsDiv.innerHTML += '<span class="tag tag-rose">⚠ Riesgo haplotípico</span>';
+  if (bull.bcn.includes('A2')) tagsDiv.innerHTML += '<span class="tag tag-emerald">✓ A2A2</span>';
+  if (bull.udc >= 1.5) tagsDiv.innerHTML += '<span class="tag tag-gold">✓ UDC élite</span>';
+  if (bull.dpr >= 2.0) tagsDiv.innerHTML += '<span class="tag tag-gold">✓ Fertilidad alta</span>';
+  if (bull.pl >= 4.0) tagsDiv.innerHTML += '<span class="tag tag-sky">✓ Alta longevidad</span>';
+
+  // Proyección cría
+  const offDiv = document.getElementById('offspringTraits');
+  const cowMN = selectedCow.gen.mn || 200;
+  const expMN = Math.round((cowMN + bull.mn) / 2 * 0.9); // transmisión ~90% del promedio
+  const expLeche = selectedCow.gen.leche ? Math.round((selectedCow.gen.leche + bull.leche) / 2) : Math.round(bull.leche * 0.85);
+  const expUDC = bull.udc;
+  const expPL = bull.pl;
+  const expDPR = bull.dpr;
+  const expGrasa = selectedCow.gen.grasa !== null ? ((selectedCow.gen.grasa + bull.grasa) / 2).toFixed(3) : bull.grasa.toFixed(3);
+
+  const traits = [
+    ['MN$ Esperado', expMN, s>=70?'#2dd4a0':'#c8a84b', expMN/10],
+    ['Leche (lbs/año)', expLeche, expLeche>800?'#2dd4a0':expLeche>0?'#c8a84b':'#e05c7a', Math.min(Math.abs(expLeche)/30,100)],
+    ['UDC Ubre', expUDC.toFixed(2), expUDC>=1.5?'#2dd4a0':expUDC>=0.5?'#c8a84b':'#e8a348', (expUDC+3)/6*100],
+    ['PL Longevidad', expPL.toFixed(1), expPL>=4?'#2dd4a0':expPL>=2?'#c8a84b':'#e8a348', expPL/7*100],
+    ['DPR Fertilidad', expDPR.toFixed(1), expDPR>=2?'#2dd4a0':expDPR>=1?'#c8a84b':'#e8a348', (expDPR+3)/6*100],
+    ['% Grasa', expGrasa, parseFloat(expGrasa)>=0.1?'#2dd4a0':parseFloat(expGrasa)>=0?'#c8a84b':'#e8a348', (parseFloat(expGrasa)+0.3)/0.6*100],
+  ];
+
+  offDiv.innerHTML = traits.map(([name, val, col, pct]) => `
+    <div class="offspring-trait">
+      <div class="ot-name">${name}</div>
+      <div class="ot-bar"><div class="ot-fill" style="width:${Math.max(0,Math.min(100,pct))}%;background:${col}"></div></div>
+      <div class="ot-val" style="color:${col}">${typeof val==='number'&&!Number.isInteger(val)?val:val}</div>
+    </div>`).join('');
+
+  // Offspring chart
+  buildOffspringChart(selectedCow, bull);
+
+  // Warnings
+  const wDiv = document.getElementById('warningsList');
+  wDiv.innerHTML = '';
+  const hapConflict = selectedCow.hap.filter(h => bull.hap.includes(h));
+  if (hapConflict.length > 0) {
+    wDiv.innerHTML += `<div class="warning-item error"><div class="warning-icon">⛔</div><div>Riesgo haplotípico: ${hapConflict.join(', ')} — Puede causar mortalidad embrionaria (25%). CAMBIAR TORO.</div></div>`;
+  } else {
+    wDiv.innerHTML += `<div class="warning-item good"><div class="warning-icon">✓</div><div>Haplotipos compatibles. Sin riesgo de mortalidad embrionaria por HH.</div></div>`;
+  }
+  if (!bull.bcn.includes('A2')) {
+    wDiv.innerHTML += `<div class="warning-item caution"><div class="warning-icon">⚠</div><div>Toro A1A2 — la cría tendrá 50% probabilidad A2. Para certificar leche A2, usar toro A2A2.</div></div>`;
+  } else {
+    wDiv.innerHTML += `<div class="warning-item good"><div class="warning-icon">✓</div><div>Toro A2A2 — cría con beta-caseína mejorada. Aptitud para leche premium.</div></div>`;
+  }
+  if (bull.udc < 0) {
+    wDiv.innerHTML += `<div class="warning-item error"><div class="warning-icon">⚠</div><div>UDC negativo — la conformación de ubre de la cría podría deteriorarse.</div></div>`;
+  } else if (bull.udc >= 1.5) {
+    wDiv.innerHTML += `<div class="warning-item good"><div class="warning-icon">✓</div><div>UDC alto (${bull.udc}) — mejora significativa de la ubre en la cría.</div></div>`;
+  }
+  if (compat.score < 50) {
+    wDiv.innerHTML += `<div class="warning-item error"><div class="warning-icon">⛔</div><div>Score de compatibilidad bajo (${s}%). Considerar otros toros de la lista.</div></div>`;
+  }
+  if (bull.reg === 'HO840003215425491') {
+    wDiv.innerHTML += `<div class="warning-item error"><div class="warning-icon">⛔</div><div>Toro Zooty ya es padre de Canela, Molly y Natacha. Consanguinidad en el hato. NO USAR.</div></div>`;
+  }
+
+  // Plan de mejora
+  buildImprovePlan(selectedCow, bull, expMN);
+
+  document.getElementById('resultPanel').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('resultPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 100);
+}
+
+function buildOffspringChart(cow, bull) {
+  const ctx = document.getElementById('chartOffspring');
+  if (!ctx) return;
+  if (offspringChart) offspringChart.destroy();
+
+  const labels = ['MN$/10','UDC×30','FLC×30','DPR×20','PL×15','Grasa×300'];
+  const bullData = [bull.mn/10, bull.udc*30+50, bull.flc*30+50, bull.dpr*20+50, bull.pl*15, (bull.grasa+0.3)*300];
+  const cowVal = cow.gen;
+  const cowData = cowVal.mn
+    ? [cowVal.mn/10, (cowVal.udc||0)*30+50, (cowVal.flc||0)*30+50, (cowVal.dpr||0)*20+50, (cowVal.pl||0)*15+30, (cowVal.grasa+0.3)*300]
+    : [50,50,50,50,50,50];
+  const expData = bullData.map((v,i) => (v + cowData[i]) / 2);
+
+  offspringChart = new Chart(ctx, {
+    type:'radar',
+    data:{
+      labels,
+      datasets:[
+        { label:'Toro', data:bullData, borderColor:'#5ba4cf', backgroundColor:'rgba(91,164,207,0.1)', pointRadius:3 },
+        { label:'Vaca', data:cowData, borderColor:'#c8a84b', backgroundColor:'rgba(200,168,75,0.08)', pointRadius:3 },
+        { label:'Cría Esperada', data:expData, borderColor:'#2dd4a0', backgroundColor:'rgba(45,212,160,0.12)', pointRadius:4, pointBackgroundColor:'#2dd4a0' },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#6b7fa8', font:{ family:'JetBrains Mono', size:10 }}}},
+      scales:{
+        r:{
+          grid:{ color:'rgba(35,45,69,0.8)' },
+          ticks:{ color:'#3a4a68', backdropColor:'transparent', font:{ family:'JetBrains Mono', size:9 }},
+          pointLabels:{ color:'#8fa3c8', font:{ family:'JetBrains Mono', size:9 }},
+          min:0
+        }
+      }
+    }
+  });
+}
+
+function buildImprovePlan(cow, bull, expMN) {
+  const div = document.getElementById('improvePlan');
+  const hapClear = selectedCow.hap.filter(h => bull.hap.includes(h)).length === 0;
+  const gen1BCN = (cow.bcn.includes('A2') && bull.bcn.includes('A2')) ? 'A2A2 (100%)' : bull.bcn.includes('A2') ? 'A2 (50% de crías)' : 'A1A2';
+
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="padding:20px;background:var(--ink3);border-radius:var(--r-sm);border:1px solid var(--line)">
+        <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:12px">GENERACIÓN F1 (18 meses)</div>
+        <div style="font-family:Playfair Display,serif;font-size:20px;color:var(--gold2);margin-bottom:8px">Cría de ${cow.nombre}</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          ▸ MN$ esperado: <span style="color:var(--emerald)">~$${expMN}</span><br>
+          ▸ Beta-caseína: <span style="color:var(--emerald)">${gen1BCN}</span><br>
+          ▸ Haplotipos: <span style="color:${hapClear?'var(--emerald)':'var(--rose)'}">${hapClear?'Reducción de riesgo':'Verificar HH'}</span><br>
+          ▸ Ubre esperada: UDC ${bull.udc>0?'+':''}<span style="color:${bull.udc>=1?'var(--emerald)':'var(--amber)'}">${bull.udc.toFixed(2)}</span><br>
+          ▸ Fertilidad: DPR <span style="color:${bull.dpr>=2?'var(--emerald)':'var(--amber)'}">+${bull.dpr.toFixed(1)}</span>
+        </div>
+      </div>
+      <div style="padding:20px;background:var(--ink3);border-radius:var(--r-sm);border:1px solid var(--line)">
+        <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:12px">GENERACIÓN F2 (4-5 años)</div>
+        <div style="font-family:Playfair Display,serif;font-size:20px;color:var(--sky);margin-bottom:8px">Hija de la F1</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          ▸ Usar toro A2A2 con MN$ &gt;$800<br>
+          ▸ Selección por: UDC &gt;1.5, DPR &gt;2.0<br>
+          ▸ Priorizar toros libres de HH<br>
+          ▸ Objetivo MN$ F2: <span style="color:var(--emerald)">~$${Math.round(expMN*1.1)}</span><br>
+          ▸ Meta: A2A2 en &gt;80% del hato
+        </div>
+      </div>
+      <div style="padding:20px;background:var(--ink3);border-radius:var(--r-sm);border:1px solid var(--line)">
+        <div style="font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:12px">METAS HATO 2028</div>
+        <div style="font-family:Playfair Display,serif;font-size:20px;color:var(--violet);margin-bottom:8px">Hato de Élite</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          ▸ MN$ promedio hato: <span style="color:var(--emerald)">&gt;$500</span><br>
+          ▸ 100% A2A2 en producción<br>
+          ▸ RCS &lt;100k/ml sostenido<br>
+          ▸ Producción &gt;25 L/vaca/día<br>
+          ▸ Grasa &gt;3.8% · Proteína &gt;3.3%
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:16px 20px;background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-radius:var(--r-sm)">
+      <div style="font-family:JetBrains Mono,monospace;font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:8px">📋 CRITERIOS TÉCNICOS APLICADOS EN ESTE ANÁLISIS</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <span>✓ Compatibilidad haplotípica HH1–HH6</span>
+        <span>✓ Selección por beta-caseína A2A2</span>
+        <span>✓ Score UDC para conformación de ubre</span>
+        <span>✓ DPR y CCR para fertilidad</span>
+        <span>✓ PL (Productive Life) longevidad</span>
+        <span>✓ SCS para salud de glándula mamaria</span>
+        <span>✓ FLC para patas y locomoción</span>
+        <span>✓ Evaluación lineal morfológica</span>
+        <span>✓ MN$ mérito neto total</span>
+        <span>✓ Prevención consanguinidad (padre Zooty)</span>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  RANKING TAB
+// ═══════════════════════════════════════════════
+function renderRanking() {
+  const div = document.getElementById('rankingCows');
+  const sorted = [...HERD].filter(c => c.gen.mn !== null).sort((a,b) => b.gen.mn - a.gen.mn);
+  const noGen = HERD.filter(c => c.gen.mn === null);
+
+  div.innerHTML = '';
+  sorted.forEach((cow, i) => {
+    const color = i===0?'#c8a84b':i===1?'#8fa3c8':i===2?'#e8a348':'var(--muted)';
+    div.innerHTML += `
+      <div class="ranking-row" onclick="selectCow('${cow.id}')">
+        <div class="ranking-num ${i<3?'gold':''}">${i+1}</div>
+        <div style="font-size:16px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'·'}</div>
+        <div class="ranking-name">${cow.nombre} <span style="font-size:11px;color:var(--muted)">(${cow.estado})</span></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${cow.bcn!=='?'?`<span class="tag ${cow.bcn.includes('A2')?'tag-emerald':'tag-amber'}">${cow.bcn}</span>`:''}
+          ${cow.hap.length>0?'<span class="tag tag-rose">⚠ HH</span>':'<span class="tag tag-emerald">✓ Sin HH</span>'}
+        </div>
+        <div class="ranking-score" style="color:${color}">$${cow.gen.mn}</div>
+      </div>`;
+  });
+
+  if (noGen.length > 0) {
+    div.innerHTML += `<div style="margin-top:16px;padding:12px;background:rgba(232,163,72,0.08);border:1px solid rgba(232,163,72,0.2);border-radius:8px;font-size:12px;color:var(--amber)">
+      <strong>⚠ ${noGen.length} animales sin evaluación genómica:</strong> ${noGen.map(c=>c.nombre).join(', ')}<br>
+      <span style="font-size:11px;color:var(--muted)">Se recomienda genotipar para optimizar la selección de toros y conocer su MN$, haplotipos y beta-caseína.</span>
+    </div>`;
+  }
+}
+
+function renderBCNTab() {
+  const div = document.getElementById('bcnList');
+  div.innerHTML = '';
+  HERD.forEach(cow => {
+    const isA2 = cow.bcn.includes('A2');
+    const unk = cow.bcn === '?';
+    const color = unk ? 'var(--amber)' : isA2 ? 'var(--emerald)' : 'var(--rose)';
+    div.innerHTML += `
+      <div class="metric-row">
+        <div class="metric-key">${cow.nombre}</div>
+        <div class="metric-val" style="color:${color};font-size:11px;font-family:JetBrains Mono,monospace">${unk?'Sin dato':cow.bcn}</div>
+      </div>`;
+  });
+}
+
+function renderLinealHerd() {
+  const ctx = document.getElementById('chartLinealHerd');
+  if (!ctx) return;
+  const withLineal = HERD.filter(c => c.lineal);
+  const keys = ['ubreAnt','altoUbre','anchoUbre','ligCentral','fortaleza','carLechero','patasPost'];
+  const labels = ['Ubre Ant','Alto Ubre','Ancho Ubre','Lig.Central','Fortaleza','Car.Lechero','Patas Post'];
+  const colors = ['#2dd4a0','#5ba4cf','#c8a84b','#9b7fe8','#e8a348','#e05c7a','#8fa3c8'];
+
+  const avgs = keys.map(k => {
+    const vals = withLineal.map(c => c.lineal[k]).filter(v => v !== undefined);
+    return vals.reduce((s,v) => s+v, 0) / vals.length;
+  });
+
+  new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'Puntaje Promedio (1-9)',
+        data:avgs,
+        backgroundColor:colors.map(c => c+'aa'),
+        borderColor:colors,
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }},
+      scales:{
+        x:{ grid:{color:'rgba(35,45,69,0.7)'}, ticks:{color:'#6b7fa8',font:{family:'JetBrains Mono',size:10}} },
+        y:{ grid:{color:'rgba(35,45,69,0.7)'}, ticks:{color:'#6b7fa8',font:{family:'JetBrains Mono',size:10}}, min:0, max:9 }
+      }
+    }
+  });
+}
+
+function renderHapTab() {
+  const div = document.getElementById('hapAnalysis');
+  const withHap = HERD.filter(c => c.hap.length > 0);
+  const noHap = HERD.filter(c => c.gen.mn !== null && c.hap.length === 0);
+  const unkn = HERD.filter(c => c.gen.mn === null);
+
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+      <div style="padding:20px;background:rgba(224,92,122,0.08);border:1px solid rgba(224,92,122,0.2);border-radius:var(--r-sm);text-align:center">
+        <div style="font-family:Playfair Display,serif;font-size:40px;color:var(--rose)">${withHap.length}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:4px">Portadoras HH</div>
+        <div style="font-size:11px;color:var(--rose);margin-top:8px">${withHap.map(c=>c.nombre).join(', ')}</div>
+      </div>
+      <div style="padding:20px;background:rgba(45,212,160,0.08);border:1px solid rgba(45,212,160,0.2);border-radius:var(--r-sm);text-align:center">
+        <div style="font-family:Playfair Display,serif;font-size:40px;color:var(--emerald)">${noHap.length}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:4px">Libres de HH</div>
+        <div style="font-size:11px;color:var(--emerald);margin-top:8px">${noHap.map(c=>c.nombre).join(', ')}</div>
+      </div>
+      <div style="padding:20px;background:rgba(232,163,72,0.08);border:1px solid rgba(232,163,72,0.2);border-radius:var(--r-sm);text-align:center">
+        <div style="font-family:Playfair Display,serif;font-size:40px;color:var(--amber)">${unkn.length}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:4px">Sin genotipar</div>
+        <div style="font-size:11px;color:var(--amber);margin-top:8px">Prioritario genotipar</div>
+      </div>
+    </div>
+
+    <div style="padding:16px 20px;background:var(--ink3);border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:16px">
+      <div style="font-family:JetBrains Mono,monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px">DETALLE HAPLOTIPOS POR ANIMAL</div>
+      ${withHap.map(c=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(35,45,69,0.5)">
+          <div style="font-size:13px;font-weight:600;color:var(--frost);min-width:100px">${c.nombre}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            ${c.hap.map(h=>`<span class="tag tag-rose">${h}</span>`).join('')}
+          </div>
+          <div style="font-size:11px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-left:auto">→ Usar toro 100% libre de: ${c.hap.join(', ')}</div>
+        </div>`).join('')}
+    </div>
+
+    <div style="padding:14px 18px;background:rgba(200,168,75,0.06);border:1px solid rgba(200,168,75,0.2);border-radius:var(--r-sm)">
+      <div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:6px">¿Qué son los Haplotipos HH?</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">Los haplotipos HH1–HH6 son variantes genéticas en Holstein que causan mortalidad embrionaria cuando la cría hereda dos copias (una de cada progenitor). Una vaca portadora de HH3T cruzada con un toro portador de HH3T tendrá un 25% de sus embriones que no sobrevivirán. <strong style="color:var(--frost)">Siempre verificar que el toro sea libre del mismo haplotipo que porta la vaca.</strong></div>
+    </div>`;
+}
+
+function initBCNChart() {
+  const ctx = document.getElementById('chartBCN');
+  if (!ctx) return;
+  const withData = HERD.filter(c => c.bcn !== '?');
+  const a2a2 = withData.filter(c => c.bcn === 'A2A2' || c.bcn === 'A2/A2').length;
+  const a1a2 = withData.filter(c => c.bcn === 'A1A2').length;
+  const a1a1 = withData.filter(c => c.bcn === 'A1A1').length;
+  const unk = HERD.filter(c => c.bcn === '?').length;
+
+  new Chart(ctx, {
+    type:'doughnut',
+    data:{
+      labels:['A2/A2','A1/A2','A1/A1','Sin dato'],
+      datasets:[{
+        data:[a2a2,a1a2,a1a1,unk],
+        backgroundColor:['rgba(45,212,160,0.7)','rgba(232,163,72,0.7)','rgba(224,92,122,0.7)','rgba(107,127,168,0.4)'],
+        borderColor:['#2dd4a0','#e8a348','#e05c7a','#6b7fa8'],
+        borderWidth:2
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#6b7fa8', font:{ family:'JetBrains Mono', size:11 }}}}
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════
+function switchTab(id, el) {
+  const allTabs = ['tabCows','tabBcn','tabLineal','tabHap'];
+  allTabs.forEach(t => document.getElementById(t).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function resetFilters() {
+  document.getElementById('sortBulls').value = 'compat';
+  document.getElementById('filterBCN').value = 'all';
+  document.getElementById('filterHap').value = 'all';
+  document.getElementById('filterMN').value = '100';
+  renderBulls();
+}
+</script>
+</body>
+</html>
